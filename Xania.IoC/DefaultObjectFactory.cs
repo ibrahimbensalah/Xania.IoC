@@ -42,7 +42,7 @@ namespace Xania.IoC
                     }).ToArray();
 
                 if (args.Any(e => e.Value == null))
-                    throw new ResolutionFailedException(null);
+                    throw new ResolutionFailedException(type);
 
                 return ctor.Invoke(args.Select(e => e.Value).ToArray());
 

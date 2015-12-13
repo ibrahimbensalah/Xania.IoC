@@ -86,7 +86,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Xania.LifetimeManager\Xania.IoC.csproj">
+    <ProjectReference Include="..\Xania.IoC\Xania.IoC.csproj">
       <Project>{b02590c4-2782-42aa-9351-b953324ce021}</Project>
       <Name>Xania.IoC</Name>
     </ProjectReference>

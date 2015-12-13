@@ -7,11 +7,11 @@ namespace Xania.IoC
     public class ResolutionFailedException : Exception
     {
         private readonly Type _type;
-        private readonly Resolvable _resolvable;
+        private readonly TypeResolvable _typeResolvable;
 
-        public ResolutionFailedException(Resolvable resolvable)
+        public ResolutionFailedException(TypeResolvable typeResolvable)
         {
-            _resolvable = resolvable;
+            _typeResolvable = typeResolvable;
         }
         public ResolutionFailedException(Type type)
         {

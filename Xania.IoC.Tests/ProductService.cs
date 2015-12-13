@@ -8,9 +8,9 @@ namespace Xania.IoC.Tests
 {
     public class ProductService: IDisposable, IProductService
     {
-        public DataContext Db { get; private set; }
+        public IDataContext Db { get; private set; }
 
-        public ProductService(DataContext db)
+        public ProductService(IDataContext db)
         {
             Db = db;
         }
@@ -21,7 +21,16 @@ namespace Xania.IoC.Tests
         }
     }
 
-    public class DataContext : IDisposable
+    public interface IProductService
+    {
+    }
+
+    public interface IDataContext
+    {
+        
+    }
+
+    public class DataContext : IDataContext, IDisposable
     {
         public void Dispose()
         {

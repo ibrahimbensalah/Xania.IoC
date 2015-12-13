@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +19,7 @@ namespace Xania.IoC
             if (implementationType == null)
                 return null;
 
-            return TypeResolvable.Create(implementationType);
+            return ConstructorResolvable.Create(implementationType);
         }
 
         public virtual Type GetImlementationType(Type sourceType)
@@ -31,83 +30,37 @@ namespace Xania.IoC
             if (registration == null)
                 return null;
 
-            return registration.TargetType;
+            return registration.ServiceType;
         }
 
         private interface IRegistry
         {
             bool IsMatch(Type type);
-            Type TargetType { get; }
-            Type SourceType { get; }
+
+            Type ServiceType { get; }
         }
 
         private class TypeRegistry: IRegistry
         {
-            public TypeRegistry(Type sourceType, Type targetType = null)
+            public TypeRegistry(Type serviceType)
             {
-                if (sourceType == null) 
-                    throw new ArgumentNullException("sourceType");
+                if (serviceType == null) 
+                    throw new ArgumentNullException("serviceType");
 
-                SourceType = sourceType;
-                TargetType = targetType ?? sourceType;
+                ServiceType = serviceType;
             }
 
-            public Type SourceType { get; private set; }
-            public Type TargetType { get; private set; }
+            public Type ServiceType { get; private set; }
+
             public bool IsMatch(Type type)
             {
-                return SourceType == type;
+                return type.IsAssignableFrom(ServiceType);
             }
         }
 
-        public void Register(Type sourceType, Type targetType)
+        public void Register(Type serviceType)
         {
-            _registrations.Add(new TypeRegistry (sourceType, targetType));
-        }
-    }
-
-    public class ResolverCollection : IResolver, IEnumerable<IResolver>
-    {
-        private readonly List<IResolver> _list;
-
-        public ResolverCollection()
-        {
-            _list = new List<IResolver>();
-        }
-
-        public IResolvable Resolve(Type type)
-        {
-            return _list.Select(r => r.Resolve(type)).FirstOrDefault(r => r != null);
-        }
-
-        public void Add(IResolver resolver)
-        {
-            _list.Add(resolver);
-        }
-
-        public IEnumerator<IResolver> GetEnumerator()
-        {
-            return _list.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    public class InstanceResolver : IResolver
-    {
-        private readonly Func<Type, object> _factory;
-
-        public InstanceResolver(Func<Type, object> factory)
-        {
-            _factory = factory;
-        }
-
-        public IResolvable Resolve(Type type)
-        {
-            return new InstanceResolvable(_factory(type));
+            _registrations.Add(new TypeRegistry (serviceType));
         }
     }
 
@@ -128,26 +81,6 @@ namespace Xania.IoC
         public object Build(IResolver resolver)
         {
             return _instance;
-        }
-
-        public IEnumerable<Type> GetDependencies()
-        {
-            return Enumerable.Empty<Type>();
-        }
-    }
-
-    public class FactoryResolver : IResolver
-    {
-        private readonly Func<Type, IResolvable> _factory;
-
-        public FactoryResolver(Func<Type, IResolvable> factory)
-        {
-            _factory = factory;
-        }
-
-        public IResolvable Resolve(Type type)
-        {
-            return _factory(type);
         }
     }
 }

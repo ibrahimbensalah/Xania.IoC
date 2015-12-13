@@ -5,10 +5,10 @@ namespace Xania.IoC
 {
     public interface IResolvable
     {
-        object Create(params object[] args);
+        // object Create(params object[] args);
 
         object Build(IResolver resolver);
 
-        IEnumerable<Type> GetDependencies();
+        // IEnumerable<Type> GetDependencies();
     }
 }

@@ -18,13 +18,7 @@ namespace Xania.IoC
 
         public static Resolver Register<TSource>(this Resolver resolver)
         {
-            resolver.Register(typeof(TSource), typeof(TSource));
-            return resolver;
-        }
-
-        public static Resolver Register<TSource, TTarget>(this Resolver resolver)
-        {
-            resolver.Register(typeof(TSource), typeof(TTarget));
+            resolver.Register(typeof(TSource));
             return resolver;
         }
     }

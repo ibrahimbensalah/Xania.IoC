@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using NSubstitute;
+﻿using FluentAssertions;
 using NUnit.Framework;
 
 namespace Xania.IoC.Tests
@@ -22,11 +16,12 @@ namespace Xania.IoC.Tests
         [Test]
         public void Resolver_returns_instance()
         {
-            var container = new PerTypeContainer(new Resolver()
-                .Register<IDataContext, DataContext>());
+            var resolver = new Resolver()
+                .Register<ProductService>()
+                .Register<DataContext>();
 
-            container
-                .Resolve<ProductService>()
+            resolver
+                .Resolve<IProductService>()
                 .Should().NotBeNull();
         }
 
@@ -40,9 +35,21 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
+        public void ResolveCollection_resolves_instance()
+        {
+            var resolver = new ResolverCollection
+            {
+                new Resolver().Register<DataContext>(),
+                new Resolver().Register<ProductService>()
+            };
+
+            resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
+        }
+
+        [Test]
         public void PerTypeContainer_resolves_same_instance_from_type()
         {
-            var container = new PerTypeContainer(new Resolver());
+            var container = new CachedObjectContainer(new ConventionBasedResolver());
 
             var instance1 = container.Resolve<DataContext>();
             var instance2 = container.Resolve<DataContext>();
@@ -51,18 +58,14 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void ResolveCollection_resolves_instance()
+        public void TrantientObjectController_resolves_nonequal_instances()
         {
-            var resolver = new ResolverCollection
-            {
-                new Resolver()
-                    .Register<IDataContext, DataContext>(),
-                new Resolver()
-                    .Register<IProductService, ProductService>()
-            };
+            var container = new TransientObjectContainer(new Resolver().Register<DataContext>());
 
-            resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
+            var instance1 = container.Resolve<DataContext>();
+            var instance2 = container.Resolve<DataContext>();
+
+            instance1.Should().NotBe(instance2);
         }
     }
-
 }

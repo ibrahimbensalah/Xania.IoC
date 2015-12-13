@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FactoryResolver.cs" />
     <Compile Include="IObjectBuilder.cs" />
     <Compile Include="IObjectContainer.cs" />
     <Compile Include="IResolvable.cs" />
@@ -51,11 +52,10 @@
     <Compile Include="DefaultObjectFactory.cs" />
     <Compile Include="IObjectFactory.cs" />
     <Compile Include="ResolutionFailedException.cs" />
+    <Compile Include="ResolverCollection.cs" />
     <Compile Include="ResolverExtensions.cs" />
-    <Compile Include="SingletonResolve.cs" />
     <Compile Include="TypeResolvable.cs" />
     <Compile Include="Resolver.cs" />
-    <Compile Include="TransientContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

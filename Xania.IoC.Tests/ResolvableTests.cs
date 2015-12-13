@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using Xania.IoC.Resolvers;
 
 namespace Xania.IoC.Tests
 {

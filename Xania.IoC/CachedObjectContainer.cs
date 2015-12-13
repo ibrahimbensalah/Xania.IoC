@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace Xania.IoC
 {
@@ -31,25 +28,6 @@ namespace Xania.IoC
             _cache.Add(type, result);
 
             return result;
-        }
-    }
-
-    public class TransientObjectContainer: IObjectContainer
-    {
-        private readonly IResolver _resolver;
-
-        public TransientObjectContainer(IResolver resolver)
-        {
-            _resolver = resolver;
-        }
-
-        public object Resolve(Type serviceType)
-        {
-            var resolvable = _resolver.Resolve(serviceType);
-            if (resolvable == null)
-                throw new ResolutionFailedException(serviceType);
-
-            return resolvable.Build(_resolver);
         }
     }
 }

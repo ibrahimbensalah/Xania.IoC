@@ -82,7 +82,6 @@
   <ItemGroup>
     <Compile Include="ProductService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resolvable.cs" />
     <Compile Include="ResolvableTests.cs" />
   </ItemGroup>
   <ItemGroup>

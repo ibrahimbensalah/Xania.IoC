@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Xania.IoC
+namespace Xania.IoC.Resolvers
 {
     public class ResolverCollection : IResolver, IEnumerable<IResolver>
     {

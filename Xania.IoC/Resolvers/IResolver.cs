@@ -1,6 +1,6 @@
 using System;
 
-namespace Xania.IoC
+namespace Xania.IoC.Resolvers
 {
     public interface IResolver
     {

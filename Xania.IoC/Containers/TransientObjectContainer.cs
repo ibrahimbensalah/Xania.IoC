@@ -1,6 +1,7 @@
 ﻿using System;
+using Xania.IoC.Resolvers;
 
-namespace Xania.IoC.Resolvers
+namespace Xania.IoC.Containers
 {
     public class TransientObjectContainer: IObjectContainer
     {
@@ -9,6 +10,11 @@ namespace Xania.IoC.Resolvers
         public TransientObjectContainer(IResolver resolver)
         {
             _resolver = resolver;
+        }
+
+        public TransientObjectContainer(params IResolver[] resolvers)
+        {
+            _resolver = new ResolverCollection(resolvers);
         }
 
         public object Resolve(Type serviceType)

@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Xania.IoC
 {
     public class ResolutionFailedException : Exception
     {
-        private readonly Type _type;
+        public Type ServiceType { get; private set; }
 
         public ResolutionFailedException(Type type)
+            : base("Resolution failed of service type: '" + type.FullName + "'")
         {
-            _type = type;
+            ServiceType = type;
         }
     }
 }

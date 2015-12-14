@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using Xania.IoC.Resolvers;
 
-namespace Xania.IoC
+namespace Xania.IoC.Containers
 {
-    public class CachedObjectContainer : IObjectContainer
+    public class ControlledObjectContainer : IObjectContainer
     {
         private readonly IResolver _resolver;
 
         private readonly IDictionary<Type, object> _cache = new Dictionary<Type, object>();
 
-        public CachedObjectContainer(IResolver resolver)
+        public ControlledObjectContainer(IResolver resolver)
         {
             _resolver = resolver;
+        }
+
+        public ControlledObjectContainer(params IResolver[] resolvers)
+        {
+            _resolver = new ResolverCollection(resolvers);
         }
 
         public object Resolve(Type type)

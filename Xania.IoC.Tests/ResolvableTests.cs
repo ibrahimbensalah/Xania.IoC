@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
 
 namespace Xania.IoC.Tests
@@ -50,7 +51,7 @@ namespace Xania.IoC.Tests
         [Test]
         public void PerTypeContainer_resolves_same_instance_from_type()
         {
-            var container = new CachedObjectContainer(new ConventionBasedResolver());
+            var container = new ControlledObjectContainer(new ConventionBasedResolver());
 
             var instance1 = container.Resolve<DataContext>();
             var instance2 = container.Resolve<DataContext>();
@@ -67,6 +68,23 @@ namespace Xania.IoC.Tests
             var instance2 = container.Resolve<DataContext>();
 
             instance1.Should().NotBe(instance2);
+        }
+
+        [Test]
+        public void ConventionBasedResolver_()
+        {
+            var resolver = new ResolverCollection()
+            {
+                new Resolver().Register<ProductService>(),
+                new ConventionBasedResolver()
+            };
+
+            resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
+            resolver.Resolve<IDataContext>().Should().BeOfType<SubDataContext>();
+        }
+
+        public class SubDataContext: DataContext
+        {
         }
     }
 }

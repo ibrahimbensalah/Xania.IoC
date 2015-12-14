@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+using Xania.IoC.Resolvers;
 
 namespace Xania.IoC
 {

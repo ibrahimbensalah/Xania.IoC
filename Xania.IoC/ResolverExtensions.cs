@@ -1,3 +1,6 @@
+using Xania.IoC.Containers;
+using Xania.IoC.Resolvers;
+
 namespace Xania.IoC
 {
     public static class ResolverExtensions

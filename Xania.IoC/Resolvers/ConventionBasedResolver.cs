@@ -28,28 +28,28 @@ namespace Xania.IoC.Resolvers
             if (implementationType == null)
                 return null;
 
-            return ConstructorResolvable.Create(implementationType);
+            return TypeResolvable.Create(implementationType);
         }
 
-        private Type GetImplementationType(Type sourceType)
+        private Type GetImplementationType(Type interfaceType)
         {
             var stack = new Stack<Type>();
-            stack.Push(sourceType);
+            stack.Push(interfaceType);
 
-            var allTypes = sourceType.Assembly.GetExportedTypes();
+            var allTypes = interfaceType.Assembly.GetExportedTypes();
 
             while (stack.Count > 0)
             {
-                var type = stack.Pop();
+                var sourceType = stack.Pop();
 
-                if (type.IsInterface || type.IsAbstract || type.GetConstructors().Length == 0)
+                if (sourceType.IsInterface || sourceType.IsAbstract || sourceType.GetConstructors().Length == 0)
                 {
-                    foreach (var subtype in allTypes.Where(e => e.BaseType == type))
+                    foreach (var subtype in allTypes.Where(t => t.GetInterfaces().Contains(sourceType) || t.BaseType == sourceType))
                         stack.Push(subtype);
                 }
                 else
                 {
-                    return type;
+                    return sourceType;
                 }
             }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Xania.IoC
+namespace Xania.IoC.Containers
 {
     public interface IObjectContainer
     {

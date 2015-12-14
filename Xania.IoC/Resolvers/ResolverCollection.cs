@@ -9,9 +9,9 @@ namespace Xania.IoC.Resolvers
     {
         private readonly List<IResolver> _list;
 
-        public ResolverCollection()
+        public ResolverCollection(params IResolver[] resolvers)
         {
-            _list = new List<IResolver>();
+            _list = new List<IResolver>(resolvers);
         }
 
         public IResolvable Resolve(Type type)

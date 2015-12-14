@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Xania.IoC
+namespace Xania.IoC.Resolvers
 {
     public class Resolver : IResolver
     {
@@ -19,7 +19,7 @@ namespace Xania.IoC
             if (implementationType == null)
                 return null;
 
-            return ConstructorResolvable.Create(implementationType);
+            return TypeResolvable.Create(implementationType);
         }
 
         public virtual Type GetImlementationType(Type sourceType)

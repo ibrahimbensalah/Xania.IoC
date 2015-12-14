@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Xania.IoC.Resolvers
 {
-    public class Resolver : IResolver
+    public class TransientResolver : IResolver
     {
         private readonly HashSet<IRegistry> _registrations;
 
-        public Resolver()
+        public TransientResolver()
         {
             _registrations = new HashSet<IRegistry>();
         }
@@ -61,26 +61,6 @@ namespace Xania.IoC.Resolvers
         public void Register(Type serviceType)
         {
             _registrations.Add(new TypeRegistry (serviceType));
-        }
-    }
-
-    public class InstanceResolvable : IResolvable
-    {
-        private readonly object _instance;
-
-        public InstanceResolvable(object instance)
-        {
-            _instance = instance;
-        }
-
-        public object Create(params object[] args)
-        {
-            return _instance;
-        }
-
-        public object Build(IResolver resolver)
-        {
-            return _instance;
         }
     }
 }

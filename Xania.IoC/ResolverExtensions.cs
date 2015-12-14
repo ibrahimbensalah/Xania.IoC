@@ -19,10 +19,10 @@ namespace Xania.IoC
             return (T) r.Build(resolver);
         }
 
-        public static Resolver Register<TSource>(this Resolver resolver)
+        public static TransientResolver Register<TSource>(this TransientResolver transientResolver)
         {
-            resolver.Register(typeof(TSource));
-            return resolver;
+            transientResolver.Register(typeof(TSource));
+            return transientResolver;
         }
     }
 }

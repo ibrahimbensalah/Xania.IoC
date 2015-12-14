@@ -40,6 +40,8 @@ namespace Xania.IoC
             return Create(args.ToArray());
         }
 
+        public Type ServiceType { get { return Ctor.DeclaringType; } }
+
         public static TypeResolvable Create(Type implementationType)
         {
             var ctor = implementationType

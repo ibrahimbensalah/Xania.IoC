@@ -43,16 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Containers\ControlledObjectContainer.cs" />
+    <Compile Include="Resolvers\ContainerControlledResolver.cs" />
     <Compile Include="Resolvers\ConventionBasedResolver.cs" />
-    <Compile Include="Containers\TransientObjectContainer.cs" />
+    <Compile Include="Containers\ObjectContainer.cs" />
     <Compile Include="Containers\IObjectContainer.cs" />
     <Compile Include="IResolvable.cs" />
+    <Compile Include="Resolvers\InstanceResolvable.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="ResolutionFailedException.cs" />
     <Compile Include="Resolvers\ResolverCollection.cs" />
     <Compile Include="ResolverExtensions.cs" />
-    <Compile Include="Resolvers\Resolver.cs" />
+    <Compile Include="Resolvers\TransientResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeResolvable.cs">
       <SubType>Code</SubType>

@@ -8,7 +8,7 @@ namespace Xania.IoC.Resolvers
 {
     public class ContainerControlledResolver: IResolver
     {
-        private readonly IDictionary<Type, InstanceResolvable> _cache = new Dictionary<Type, InstanceResolvable>();
+        private readonly IDictionary<Type, InstanceResolvable> _resolvableCache = new Dictionary<Type, InstanceResolvable>();
         private readonly IResolver _resolver;
 
         public ContainerControlledResolver(params IResolver[] resolvers)
@@ -28,10 +28,10 @@ namespace Xania.IoC.Resolvers
                 return null;
 
             InstanceResolvable instance;
-            if (!_cache.TryGetValue(resolvable.ServiceType, out instance))
+            if (!_resolvableCache.TryGetValue(resolvable.ServiceType, out instance))
             {
                 instance = new InstanceResolvable(resolvable.ServiceType, resolvable.Build(_resolver));
-                _cache.Add(resolvable.ServiceType, instance);
+                _resolvableCache.Add(resolvable.ServiceType, instance);
             }
 
             return instance;

@@ -8,39 +8,50 @@ namespace Xania.IoC
 {
     public class TypeResolvable: IResolvable
     {
-        public ConstructorInfo Ctor { get; set; }
+        private readonly ConstructorInfo[] _ctors;
 
-        public TypeResolvable(ConstructorInfo ctor)
+        public TypeResolvable(Type serviceType, params ConstructorInfo[] ctors)
         {
-            Ctor = ctor;
+            ServiceType = serviceType;
+            _ctors = ctors;
         }
 
-        public IEnumerable<Type> GetDependencies()
+        private IEnumerable<Type> GetDependencies(ConstructorInfo ctor)
         {
-            return Ctor.GetParameters().Select(p => p.ParameterType);
+            return ctor.GetParameters().Select(p => p.ParameterType);
         }
 
-        public object Create(object[] args)
+        public object Create(ConstructorInfo ctor, object[] args)
         {
             if (args.Any(x => x == null))
-                throw new ResolutionFailedException(Ctor.DeclaringType);
+                return null;
 
-            return Ctor.Invoke(args);
+            return ctor.Invoke(args);
         }
 
         public object Build(IResolver resolver)
         {
-            var args = GetDependencies().Select(d =>
+            var instance = _ctors.Select(ctor => Build(ctor, resolver)).FirstOrDefault(e => e != null);
+
+            if (instance == null)
+                throw new ResolutionFailedException(ServiceType);
+
+            return instance;
+        }
+
+        public object Build(ConstructorInfo ctor, IResolver resolver)
+        {
+            var args = GetDependencies(ctor).Select(d =>
             {
                 var r = resolver.Resolve(d);
                 if (r == null)
                     throw new ResolutionFailedException(d);
                 return r.Build(resolver);
             });
-            return Create(args.ToArray());
+            return Create(ctor, args.ToArray());
         }
 
-        public Type ServiceType { get { return Ctor.DeclaringType; } }
+        public Type ServiceType { get; private set; }
 
         public static TypeResolvable Create(Type implementationType)
         {
@@ -49,26 +60,7 @@ namespace Xania.IoC
                 .OrderByDescending(e => e.GetParameters().Length)
                 .FirstOrDefault();
 
-            return new TypeResolvable(ctor);
+            return new TypeResolvable(implementationType, ctor);
         }
     }
-
-    //public class TypeResolvable : IResolvable
-    //{
-    //    private readonly Type _type;
-
-    //    public TypeResolvable(Type type)
-    //    {
-    //        _type = type;
-    //    }
-
-    //    public object Build(IResolver resolver)
-    //    {
-    //        var resolvable = resolver.Resolve(_type);
-    //        if (resolvable == null)
-    //            throw new ResolutionFailedException(_type);
-
-    //        return resolvable.Build(resolver);
-    //    }
-    //}
 }

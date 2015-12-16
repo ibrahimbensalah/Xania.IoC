@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Xania.IoC.Resolvers
 {
@@ -9,9 +10,10 @@ namespace Xania.IoC.Resolvers
     {
         private readonly List<Assembly> _assemblies;
 
-        public ConventionBasedResolver()
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public ConventionBasedResolver(params Assembly[] assemblies)
         {
-            _assemblies = new List<Assembly>();
+            _assemblies = new List<Assembly>(assemblies) {Assembly.GetCallingAssembly()};
         }
 
         public void RegisterAssembly(Assembly assembly)
@@ -36,7 +38,7 @@ namespace Xania.IoC.Resolvers
             var stack = new Stack<Type>();
             stack.Push(interfaceType);
 
-            var allTypes = interfaceType.Assembly.GetExportedTypes();
+            var allTypes = _assemblies.SelectMany(a => a.GetExportedTypes()).ToArray();
 
             while (stack.Count > 0)
             {

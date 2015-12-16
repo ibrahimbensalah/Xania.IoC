@@ -4,7 +4,7 @@ using Xania.IoC.Resolvers;
 
 namespace Xania.IoC.Containers
 {
-    public class ObjectContainer: IObjectContainer
+    public class ObjectContainer : IObjectContainer
     {
         private readonly IResolver[] _resolvers;
 
@@ -15,11 +15,9 @@ namespace Xania.IoC.Containers
 
         public object Resolve(Type serviceType)
         {
-            var result = _resolvers.Select(resolver => Resolve(serviceType, resolver)).FirstOrDefault(x => x != null);
-            if (result == null)
-                throw new ResolutionFailedException(serviceType);
-
-            return result;
+            return _resolvers
+                .Select(resolver => Resolve(serviceType, resolver))
+                .FirstOrDefault(x => x != null);
         }
 
         private object Resolve(Type type, IResolver resolver)

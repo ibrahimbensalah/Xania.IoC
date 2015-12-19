@@ -280,3 +280,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.ncrunchproject
+/Xania.IoC.v2.ncrunchsolution

@@ -60,7 +60,7 @@ namespace Xania.IoC.Resolvers
 
         public void Register(Type serviceType)
         {
-            _registrations.Add(new TypeRegistry (serviceType));
+            _registrations.Add(new TypeRegistry(serviceType));
         }
     }
 }

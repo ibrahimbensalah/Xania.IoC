@@ -22,6 +22,9 @@ namespace Xania.IoC
 
         public static object Build(this IResolver resolver, IResolvable resolvable)
         {
+            if (resolvable == null)
+                return null;
+
             var args = resolvable.GetDependencies().Select(d =>
             {
                 var r = resolver.Resolve(d);

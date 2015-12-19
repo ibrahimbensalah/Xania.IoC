@@ -30,13 +30,24 @@ namespace Xania.IoC.Tests
 
     public interface IDataContext
     {
-        
+        bool IsDisposed { get; }
+        Guid Id { get; }
     }
 
     public class DataContext : IDataContext, IDisposable
     {
+        public DataContext()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public void Dispose()
         {
+            IsDisposed = true;
         }
+
+        public Guid Id { get; private set; }
+
+        public bool IsDisposed { get; private set; }
     }
 }

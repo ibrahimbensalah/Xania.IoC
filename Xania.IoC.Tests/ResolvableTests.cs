@@ -71,16 +71,16 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void ConventionBasedResolver_()
+        public void ConventionBasedResolver_resolves_closest_subtype()
         {
             var resolver = new ResolverCollection()
             {
-                new TransientResolver().Register<ProductService>(),
+                // new TransientResolver().Register<ProductService>(),
                 new ConventionBasedResolver()
             };
 
             resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
-            resolver.Resolve<IDataContext>().Should().BeOfType<SubDataContext>();
+            resolver.Resolve<IDataContext>().Should().BeOfType<DataContext>();
         }
 
         public class SubDataContext: DataContext
@@ -88,7 +88,7 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void LifetimeTests()
+        public void DisposeTests()
         {
             var resolver = new ContainerControlledResolver(new ConventionBasedResolver());
             var productService = resolver.Resolve<IProductService>();
@@ -98,6 +98,24 @@ namespace Xania.IoC.Tests
             productService.IsDisposed.Should().BeTrue();
 
             resolver.Resolve<IProductService>().Should().NotBeSameAs(productService);
+        }
+
+        [Test]
+        public void LifetimeTests()
+        {
+            // arrange
+            var instanceScopeProvider = new ScopeProvider();
+            var resolver = new ContainerControlledResolver(new ConventionBasedResolver());
+            resolver.AddScopeProvider(typeof (IDataContext), instanceScopeProvider);
+
+            var id = resolver.Resolve<IDataContext>().Id;
+            resolver.Resolve<IDataContext>().Id.Should().Be(id);
+
+            // act, change scope
+            instanceScopeProvider.Dispose();
+
+            // resolve after scope change
+            resolver.Resolve<IDataContext>().Id.Should().NotBe(id);
         }
     }
 }

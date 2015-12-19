@@ -1,3 +1,4 @@
+using System.Linq;
 using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
 
@@ -16,7 +17,19 @@ namespace Xania.IoC
             if (r == null)
                 throw new ResolutionFailedException(typeof(T));
 
-            return (T) r.Build(resolver);
+            return (T) resolver.Build(r);
+        }
+
+        public static object Build(this IResolver resolver, IResolvable resolvable)
+        {
+            var args = resolvable.GetDependencies().Select(d =>
+            {
+                var r = resolver.Resolve(d);
+                if (r == null)
+                    throw new ResolutionFailedException(d);
+                return resolver.Build(r);
+            });
+            return resolvable.Create(args.ToArray());
         }
 
         public static TransientResolver Register<TSource>(this TransientResolver transientResolver)

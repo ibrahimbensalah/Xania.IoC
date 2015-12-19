@@ -17,12 +17,15 @@ namespace Xania.IoC.Tests
 
         public void Dispose()
         {
-            
+            IsDisposed = true;
         }
+
+        public bool IsDisposed { get; private set; }
     }
 
     public interface IProductService
     {
+        bool IsDisposed { get; }
     }
 
     public interface IDataContext

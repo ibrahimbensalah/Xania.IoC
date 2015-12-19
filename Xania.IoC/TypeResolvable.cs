@@ -8,48 +8,48 @@ namespace Xania.IoC
 {
     public class TypeResolvable: IResolvable
     {
-        private readonly ConstructorInfo[] _ctors;
+        private readonly ConstructorInfo _ctor;
 
-        public TypeResolvable(Type serviceType, params ConstructorInfo[] ctors)
+        public TypeResolvable(Type serviceType, ConstructorInfo ctor)
         {
+            _ctor = ctor;
             ServiceType = serviceType;
-            _ctors = ctors;
         }
 
-        private IEnumerable<Type> GetDependencies(ConstructorInfo ctor)
+        public IEnumerable<Type> GetDependencies()
         {
-            return ctor.GetParameters().Select(p => p.ParameterType);
+            return _ctor.GetParameters().Select(p => p.ParameterType);
         }
 
-        public object Create(ConstructorInfo ctor, object[] args)
+        public object Create(params object[] args)
         {
             if (args.Any(x => x == null))
                 return null;
 
-            return ctor.Invoke(args);
+            return _ctor.Invoke(args);
         }
 
-        public object Build(IResolver resolver)
-        {
-            var instance = _ctors.Select(ctor => Build(ctor, resolver)).FirstOrDefault(e => e != null);
+        //public object Build(IResolver resolver)
+        //{
+        //    var instance = _ctors.Select(ctor => Build(ctor, resolver)).FirstOrDefault(e => e != null);
 
-            if (instance == null)
-                throw new ResolutionFailedException(ServiceType);
+        //    if (instance == null)
+        //        throw new ResolutionFailedException(ServiceType);
 
-            return instance;
-        }
+        //    return instance;
+        //}
 
-        public object Build(ConstructorInfo ctor, IResolver resolver)
-        {
-            var args = GetDependencies(ctor).Select(d =>
-            {
-                var r = resolver.Resolve(d);
-                if (r == null)
-                    throw new ResolutionFailedException(d);
-                return r.Build(resolver);
-            });
-            return Create(ctor, args.ToArray());
-        }
+        //public object Build(ConstructorInfo ctor, IResolver resolver)
+        //{
+        //    var args = GetDependencies(ctor).Select(d =>
+        //    {
+        //        var r = resolver.Resolve(d);
+        //        if (r == null)
+        //            throw new ResolutionFailedException(d);
+        //        return r.Build(resolver);
+        //    });
+        //    return Create(ctor, args.ToArray());
+        //}
 
         public Type ServiceType { get; private set; }
 

@@ -86,5 +86,18 @@ namespace Xania.IoC.Tests
         public class SubDataContext: DataContext
         {
         }
+
+        [Test]
+        public void LifetimeTests()
+        {
+            var resolver = new ContainerControlledResolver(new ConventionBasedResolver());
+            var productService = resolver.Resolve<IProductService>();
+            resolver.Resolve<IProductService>().Should().BeSameAs(productService);
+
+            resolver.Dispose(typeof(IProductService));
+            productService.IsDisposed.Should().BeTrue();
+
+            resolver.Resolve<IProductService>().Should().NotBeSameAs(productService);
+        }
     }
 }

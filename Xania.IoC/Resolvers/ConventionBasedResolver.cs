@@ -8,12 +8,17 @@ namespace Xania.IoC.Resolvers
 {
     public class ConventionBasedResolver: IResolver
     {
-        private readonly List<Assembly> _assemblies;
+        private readonly ICollection<Assembly> _assemblies;
 
         [MethodImpl(MethodImplOptions.NoInlining)]
+        public ConventionBasedResolver()
+        {
+            _assemblies = new[] { Assembly.GetCallingAssembly() };
+        }
+
         public ConventionBasedResolver(params Assembly[] assemblies)
         {
-            _assemblies = new List<Assembly>(assemblies) {Assembly.GetCallingAssembly()};
+            _assemblies = new List<Assembly>(assemblies);
         }
 
         public void RegisterAssembly(Assembly assembly)

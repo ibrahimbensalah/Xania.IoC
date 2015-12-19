@@ -26,7 +26,7 @@ namespace Xania.IoC.Containers
             if (resolvable == null)
                 return null;
 
-            return resolvable.Build(resolver);
+            return resolver.Build(resolvable);
         }
     }
 }

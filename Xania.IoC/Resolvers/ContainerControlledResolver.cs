@@ -28,6 +28,11 @@ namespace Xania.IoC.Resolvers
             return _resolvableCache.Get(type, () => new InstanceResolvable(observable));
         }
 
+        public IEnumerable<IResolvable> ResolveAll(Type type)
+        {
+            return new[] {Resolve(type)};
+        }
+
         public void Dispose(Type type)
         {
             _resolvableCache.Dispose(type);

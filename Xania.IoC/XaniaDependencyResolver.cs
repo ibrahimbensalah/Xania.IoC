@@ -21,15 +21,15 @@ namespace Xania.IoC
             {
                 if (_resolver == null)
                 {
-                    _resolver = GetResolver();
+                    _resolver = BuildResolver();
                 }
                 return _resolver;
             }
         }
 
-        protected abstract IResolver GetResolver();
+        protected abstract IResolver BuildResolver();
 
-        public void EndRequest(object sender, EventArgs eventArgs)
+        protected void OnEndRequest()
         {
             Get().DisposeAll();
         }
@@ -41,7 +41,7 @@ namespace Xania.IoC
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return Enumerable.Empty<object>();
+            return new[] {GetService(serviceType)};
         }
     }
 }

@@ -15,9 +15,16 @@ namespace Xania.IoC.Resolvers
             Predicates = new List<Func<Type, bool>>();
         }
 
-        public void Include(Func<Type, bool> predicate)
+        public IdentityResolver Include(Func<Type, bool> predicate)
         {
             Predicates.Add(predicate);
+            return this;
+        }
+
+        public IdentityResolver For<T>()
+        {
+            Include(t => typeof (T).IsAssignableFrom(t));
+            return this;
         }
 
         public IResolvable Resolve(Type type)

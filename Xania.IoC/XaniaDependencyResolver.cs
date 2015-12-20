@@ -34,12 +34,12 @@ namespace Xania.IoC
             Get().DisposeAll();
         }
 
-        public object GetService(Type serviceType)
+        public virtual object GetService(Type serviceType)
         {
             return Resolver.Resolve(serviceType).Build(Resolver);
         }
 
-        public IEnumerable<object> GetServices(Type serviceType)
+        public virtual IEnumerable<object> GetServices(Type serviceType)
         {
             return new[] {GetService(serviceType)};
         }

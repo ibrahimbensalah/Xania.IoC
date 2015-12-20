@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,15 +12,34 @@ namespace Xania.IoC
 
     public class ScopeProvider : IScopeProvider
     {
-        private Scope _scope;
+        private readonly Func<IDictionary> _backingStore;
+        private readonly Guid _id;
+
+        public ScopeProvider()
+            : this(new Hashtable())
+        {
+        }
+
+        public ScopeProvider(IDictionary backingStore)
+            : this(() => backingStore)
+        {
+        }
+
+        public ScopeProvider(Func<IDictionary> backingStore)
+        {
+            _backingStore = backingStore;
+            _id = Guid.NewGuid();
+        }
 
         public IDictionary<Type, object> Get()
         {
-            return _scope ?? (_scope = new Scope());
-        }
+            var items = _backingStore();
+            if (!items.Contains(_id))
+            {
+                items[_id] = new Dictionary<Type, object>();
+            }
 
-        internal class Scope : Dictionary<Type, object>
-        {
+            return (IDictionary<Type, object>)items[_id];
         }
     }
 }

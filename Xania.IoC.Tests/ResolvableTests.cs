@@ -124,5 +124,13 @@ namespace Xania.IoC.Tests
             // resolve after scope change
             proxy.Id.Should().NotBe(id);
         }
+
+        [Test]
+        public void Should_be_able_to_resolve_subtypes()
+        {
+            var resolver = new IdentityResolver().For<IDataContext>();
+
+            resolver.Resolve<DataContext>().Should().BeOfType<DataContext>();
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
@@ -40,6 +41,17 @@ namespace Xania.IoC
         {
             transientResolver.Register(typeof(TSource));
             return transientResolver;
+        }
+
+        public static PerScopeResolver PerScope(this IResolver resolver, IScopeProvider scopeProvider)
+        {
+            return new PerScopeResolver(scopeProvider, resolver);
+        }
+
+        public static PerScopeResolver PerScope(this IResolver resolver, Func<IDictionary> backingStore)
+        {
+            var scopeProvider = new ScopeProvider(backingStore);
+            return new PerScopeResolver(scopeProvider, resolver);
         }
     }
 }

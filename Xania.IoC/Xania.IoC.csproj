@@ -54,6 +54,7 @@
     <Compile Include="Resolvers\ResolverCollection.cs" />
     <Compile Include="ResolverExtensions.cs" />
     <Compile Include="Resolvers\ScopeDecoraptor.cs" />
+    <Compile Include="Resolvers\IDentityResolver.cs" />
     <Compile Include="Resolvers\TransientResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScopeProvider.cs" />

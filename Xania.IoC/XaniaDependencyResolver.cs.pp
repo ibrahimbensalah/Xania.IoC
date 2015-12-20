@@ -1,6 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Xania.IoC;
 using Xania.IoC.Resolvers;
 
 namespace $defaultNamespace$
@@ -13,21 +16,11 @@ namespace $defaultNamespace$
 
             mvcApplication.EndRequest += (sender, args) =>
             {
-	            ScopeProvider.Get().DisposeAll();
+	            PerRequestScopeProvider.Get().DisposeAll();
             };
         }
 
-        protected virtual IResolver BuildResolver()
-        {
-            return new ResolverCollection
-            {
-                new ContainerControlledResolver(new ConventionBasedResolver()),
-                new IdentityResolver().For<Controller>(),
-				GetPerRequestResolver().PerScope(PerRequestScopeProvider),
-            };
-        }
-
-		private IResolver GetPerRequestResolver() 
+		protected virtual IResolver GetPerRequestResolver() 
 		{
 			return new TransientResolver()
 	            // TODO: register here per request types
@@ -35,15 +28,21 @@ namespace $defaultNamespace$
 				;
 		}
 
-		public IScopeProvider PerRequestScopeProvider { get; public set; }
+		public IScopeProvider PerRequestScopeProvider { get; private set; }
 
+		private IResolver _resolver;
         public IResolver Resolver
         {
             get
             {
                 if (_resolver == null)
                 {
-                    _resolver = BuildResolver();
+                    _resolver = new ResolverCollection
+					{
+						new ContainerControlledResolver(new ConventionBasedResolver()),
+						new IdentityResolver().For<Controller>(),
+						GetPerRequestResolver().PerScope(PerRequestScopeProvider),
+					};
                 }
                 return _resolver;
             }

@@ -55,8 +55,7 @@ namespace Xania.IoC.Resolvers
             var result = methodInfo.Invoke(instance, methodCall.InArgs);
             // Console.WriteLine("Postcall " + methodInfo.Name);
 
-            return new ReturnMessage(result, null, 0,
-                methodCall.LogicalCallContext, methodCall);
+            return new ReturnMessage(result, null, 0, methodCall.LogicalCallContext, methodCall);
         }
 
         private object GetInstance()

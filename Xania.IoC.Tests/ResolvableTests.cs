@@ -101,12 +101,10 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void WithScopeProvider_should_resolve_proxy_that_propagate_methodcall_to_object_in_scope()
+        public void PerScopeResolver_should_resolve_proxy_that_propagate_methodcall_to_object_in_scope()
         {
-            // arrange
             var scopeProvider = new ScopeProvider();
-            var resolver = new ContainerControlledResolver(new ConventionBasedResolver())
-                .WithScopeProvider(typeof (IDataContext), scopeProvider);
+            var resolver = new PerScopeResolver(scopeProvider, new ConventionBasedResolver());
 
             var proxy = resolver.Resolve<IDataContext>();
             var id = proxy.Id;
@@ -114,7 +112,6 @@ namespace Xania.IoC.Tests
 
             // act, change scope
             proxy.Dispose();
-            // instanceScopeProvider.Get().Dispose(typeof(IDataContext));
 
             // resolve after scope change
             proxy.Id.Should().NotBe(id);

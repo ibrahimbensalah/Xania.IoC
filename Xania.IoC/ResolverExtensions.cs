@@ -22,6 +22,11 @@ namespace Xania.IoC
             return (T) resolver.Build(r);
         }
 
+        public static object Build(this IResolvable resolvable, IResolver resolver)
+        {
+            return resolver.Build(resolvable);
+        }
+
         public static object Build(this IResolver resolver, IResolvable resolvable)
         {
             if (resolvable == null)

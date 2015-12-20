@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
@@ -39,6 +40,14 @@ namespace Xania.IoC
         {
             transientResolver.Register(typeof(TSource));
             return transientResolver;
+        }
+
+
+        public static TResolver WithScopeProvider<TResolver>(this TResolver resolver, Type type, ScopeProvider scopeProvider)
+            where TResolver: ContainerControlledResolver
+        {
+            resolver.ScopeProviders.Add(type, scopeProvider);
+            return resolver;
         }
     }
 }

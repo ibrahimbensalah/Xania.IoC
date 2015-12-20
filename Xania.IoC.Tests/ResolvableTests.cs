@@ -101,21 +101,23 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void LifetimeTests()
+        public void WithScopeProvider_should_resolve_proxy_that_propagate_methodcall_to_object_in_scope()
         {
             // arrange
-            var instanceScopeProvider = new ScopeProvider();
-            var resolver = new ContainerControlledResolver(new ConventionBasedResolver());
-            resolver.AddScopeProvider(typeof (IDataContext), instanceScopeProvider);
+            var scopeProvider = new ScopeProvider();
+            var resolver = new ContainerControlledResolver(new ConventionBasedResolver())
+                .WithScopeProvider(typeof (IDataContext), scopeProvider);
 
-            var id = resolver.Resolve<IDataContext>().Id;
-            resolver.Resolve<IDataContext>().Id.Should().Be(id);
+            var proxy = resolver.Resolve<IDataContext>();
+            var id = proxy.Id;
+            proxy.Id.Should().Be(id);
 
             // act, change scope
-            instanceScopeProvider.Dispose();
+            proxy.Dispose();
+            // instanceScopeProvider.Get().Dispose(typeof(IDataContext));
 
             // resolve after scope change
-            resolver.Resolve<IDataContext>().Id.Should().NotBe(id);
+            proxy.Id.Should().NotBe(id);
         }
     }
 }

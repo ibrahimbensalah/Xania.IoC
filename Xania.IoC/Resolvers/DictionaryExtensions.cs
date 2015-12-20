@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Xania.IoC.Resolvers
 {
-    internal static class DictionaryExtensions
+    public static class DictionaryExtensions
     {
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> cache, TKey key, Func<TValue> factory)
         {
@@ -26,6 +28,25 @@ namespace Xania.IoC.Resolvers
                 disp.Dispose();
 
             return true;
+        }
+
+        public static void DisposeAll<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, bool clearAll = true)
+        {
+            if (dictionary != null)
+            {
+                foreach (var item in dictionary.Values.OfType<IDisposable>())
+                    item.Dispose();
+
+                if (clearAll)
+                    dictionary.Clear();
+            }
+        }
+
+        public static void Dispose(this object instance)
+        {
+            var disposable = instance as IDisposable;
+            if (disposable != null)
+                disposable.Dispose();
         }
     }
 }

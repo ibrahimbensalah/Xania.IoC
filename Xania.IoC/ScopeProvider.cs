@@ -4,7 +4,12 @@ using System.Linq;
 
 namespace Xania.IoC
 {
-    public class ScopeProvider
+    public interface IScopeProvider
+    {
+        IDictionary<Type, object> Get();
+    }
+
+    public class ScopeProvider : IScopeProvider
     {
         private Scope _scope;
 
@@ -13,24 +18,8 @@ namespace Xania.IoC
             return _scope ?? (_scope = new Scope());
         }
 
-        public void Dispose()
+        internal class Scope : Dictionary<Type, object>
         {
-            if (_scope != null)
-            {
-                _scope.Dispose();
-                _scope = null;
-            }
-        }
-
-        internal class Scope : Dictionary<Type, object>, IDisposable
-        {
-            public void Dispose()
-            {
-                foreach (var item in Values.OfType<IDisposable>())
-                {
-                    item.Dispose();
-                }
-            }
         }
     }
 }

@@ -7,12 +7,12 @@ namespace Xania.IoC.Resolvers
     {
         private readonly IDictionary<Type, InstanceResolvable> _resolvableCache = new Dictionary<Type, InstanceResolvable>();
         private readonly IResolver _resolver;
-        private readonly Dictionary<Type, ScopeProvider> _scopeProviders;
+        public Dictionary<Type, IScopeProvider> ScopeProviders { get; private set; }
 
         public ContainerControlledResolver(params IResolver[] resolvers)
         {
             _resolver = new ResolverCollection(resolvers);
-            _scopeProviders = new Dictionary<Type, ScopeProvider>();
+            ScopeProviders = new Dictionary<Type, IScopeProvider>();
         }
         
         /// <summary>
@@ -31,8 +31,8 @@ namespace Xania.IoC.Resolvers
             if (observable == null)
                 return null;
 
-            ScopeProvider scopeProvider;
-            if (_scopeProviders.TryGetValue(type, out scopeProvider))
+            IScopeProvider scopeProvider;
+            if (ScopeProviders.TryGetValue(type, out scopeProvider))
             {
                 return new ScopeDecoraptor(type, () => _resolver.Build(observable), scopeProvider).GetTransparentProxy();
             }
@@ -42,11 +42,6 @@ namespace Xania.IoC.Resolvers
         public void Dispose(Type type)
         {
             _resolvableCache.Dispose(type);
-        }
-
-        public void AddScopeProvider(Type type, ScopeProvider scopeProvider)
-        {
-            _scopeProviders.Add(type, scopeProvider);
         }
     }
 }

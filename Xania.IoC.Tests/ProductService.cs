@@ -28,7 +28,7 @@ namespace Xania.IoC.Tests
         bool IsDisposed { get; }
     }
 
-    public interface IDataContext
+    public interface IDataContext: IDisposable
     {
         bool IsDisposed { get; }
         Guid Id { get; }

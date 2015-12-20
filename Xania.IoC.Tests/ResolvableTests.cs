@@ -16,6 +16,14 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
+        public void Resolver_returns_null()
+        {
+            var resolver = new ContainerControlledResolver(new TransientResolver());
+
+            resolver.Resolve(typeof(IProductService)).Should().BeNull();
+        }
+
+        [Test]
         public void Resolver_returns_instance()
         {
             var resolver = new TransientResolver()

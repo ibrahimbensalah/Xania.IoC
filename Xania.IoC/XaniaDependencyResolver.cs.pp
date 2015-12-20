@@ -55,7 +55,10 @@ namespace $defaultNamespace$
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return Enumerable.Empty<object>();
+            var instance =  Resolver.Resolve(serviceType).Build(Resolver);
+            if (instance == null)
+                return Enumerable.Empty<object>();
+            return new[] {instance};
         }
     }
 }

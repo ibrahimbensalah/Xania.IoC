@@ -50,4 +50,17 @@ namespace Xania.IoC.Tests
 
         public bool IsDisposed { get; private set; }
     }
+
+    public interface IRepository<T>
+    {
+        
+    }
+
+    public class MemoryRepository<T> : IRepository<T>
+    {
+    }
+
+    public class IntegerRepository : MemoryRepository<int>
+    {
+    }
 }

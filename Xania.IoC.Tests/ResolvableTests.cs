@@ -132,5 +132,13 @@ namespace Xania.IoC.Tests
 
             resolver.Resolve<DataContext>().Should().BeOfType<DataContext>();
         }
+
+        [Test]
+        public void Should_be_able_to_resolve_generics()
+        {
+            var resolver = new IdentityResolver().For(typeof (MemoryRepository<>));
+            resolver.Resolve<IntegerRepository>().Should().BeOfType<IntegerRepository>();
+        }
+
     }
 }

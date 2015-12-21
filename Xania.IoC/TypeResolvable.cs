@@ -11,6 +11,9 @@ namespace Xania.IoC
 
         public TypeResolvable(Type serviceType, ConstructorInfo ctor)
         {
+            if (ctor == null) 
+                throw new ArgumentNullException("ctor");
+
             _ctor = ctor;
             ServiceType = serviceType;
         }
@@ -36,6 +39,9 @@ namespace Xania.IoC
                 .GetConstructors()
                 .OrderByDescending(e => e.GetParameters().Length)
                 .FirstOrDefault();
+
+            if (ctor == null)
+                return null;
 
             return new TypeResolvable(implementationType, ctor);
         }

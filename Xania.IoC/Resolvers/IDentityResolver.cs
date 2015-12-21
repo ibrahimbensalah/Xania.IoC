@@ -8,28 +8,56 @@ namespace Xania.IoC.Resolvers
 {
     public class IdentityResolver: IResolver
     {
-        public ICollection<Func<Type, bool>> Predicates { get; private set; }
+        public readonly ICollection<Type> BaseTypes;
 
         public IdentityResolver()
         {
-            Predicates = new List<Func<Type, bool>>();
+            BaseTypes = new List<Type>();
         }
 
-        public IdentityResolver Include(Func<Type, bool> predicate)
+        public IdentityResolver For(Type baseType)
         {
-            Predicates.Add(predicate);
+            BaseTypes.Add(baseType);
             return this;
         }
 
         public IdentityResolver For<T>()
         {
-            Include(t => typeof (T).IsAssignableFrom(t));
+            For(typeof (T));
             return this;
         }
 
         public IResolvable Resolve(Type type)
         {
-            return Predicates.Any(p => p(type)) ? TypeResolvable.Create(type) : null;
+            return BaseTypes.Any(x=> IsAssignableFrom(x, type)) ? TypeResolvable.Create(type) : null;
+        }
+
+        private static bool IsAssignableFrom(Type baseType, Type type)
+        {
+            if (!baseType.IsGenericTypeDefinition)
+                return baseType.IsAssignableFrom(type);
+
+            var stack = new Stack<Type>();
+            stack.Push(type);
+            foreach (var i in type.GetInterfaces())
+                stack.Push(i);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+
+                if (current.IsGenericType)
+                {
+                    var genericType = current.GetGenericTypeDefinition();
+                    if (baseType == genericType)
+                        return true;
+                }
+
+                if (current.BaseType != null)
+                    stack.Push(current.BaseType);
+            }
+
+            return false;
         }
     }
 }

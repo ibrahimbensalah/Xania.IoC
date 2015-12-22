@@ -27,9 +27,10 @@ namespace Xania.IoC.Resolvers
             return this;
         }
 
-        public IResolvable Resolve(Type type)
+        public IEnumerable<IResolvable> ResolveAll(Type type)
         {
-            return BaseTypes.Any(x=> IsAssignableFrom(x, type)) ? TypeResolvable.Create(type) : null;
+            if (BaseTypes.Any(x => IsAssignableFrom(x, type)))
+                yield return TypeResolvable.Create(type);
         }
 
         private static bool IsAssignableFrom(Type baseType, Type type)

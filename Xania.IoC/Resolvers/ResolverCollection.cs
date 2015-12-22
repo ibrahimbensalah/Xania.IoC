@@ -14,9 +14,9 @@ namespace Xania.IoC.Resolvers
             _list = new List<IResolver>(resolvers);
         }
 
-        public IResolvable Resolve(Type type)
+        public IEnumerable<IResolvable> ResolveAll(Type type)
         {
-            return _list.Select(r => r.Resolve(type)).LastOrDefault(r => r != null);
+            return _list.SelectMany(r => r.ResolveAll(type)).Where(r => r != null);
         }
 
         public void Add(IResolver resolver)

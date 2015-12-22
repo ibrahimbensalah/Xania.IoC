@@ -8,19 +8,11 @@ namespace Xania.IoC.Tests
     public class ResolvableTests
     {
         [Test]
-        public void Resolver_throws_when_resolving_unregistered_interface()
-        {
-            new TransientResolver()
-                .Invoking(c => c.Resolve<IDataContext>())
-                .ShouldThrow<ResolutionFailedException>();
-        }
-
-        [Test]
         public void Resolver_returns_null()
         {
             var resolver = new ContainerControlledResolver(new TransientResolver());
 
-            resolver.Resolve(typeof(IProductService)).Should().BeNull();
+            resolver.ResolveAll(typeof(IProductService)).Should().BeEmpty();
         }
 
         [Test]
@@ -59,7 +51,7 @@ namespace Xania.IoC.Tests
         [Test]
         public void PerTypeContainer_resolves_same_instance_from_type()
         {
-            var container = new ObjectContainer(new ContainerControlledResolver(new ConventionBasedResolver()));
+            var container = new ContainerControlledResolver(new ConventionBasedResolver());
 
             var instance1 = container.Resolve<DataContext>();
             var instance2 = container.Resolve<DataContext>();
@@ -68,9 +60,9 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void TrantientObjectController_resolves_nonequal_instances()
+        public void TransientObjectController_resolves_nonequal_instances()
         {
-            var container = new ObjectContainer(new TransientResolver().Register<DataContext>());
+            var container = new TransientResolver().Register<DataContext>();
 
             var instance1 = container.Resolve<DataContext>();
             var instance2 = container.Resolve<DataContext>();

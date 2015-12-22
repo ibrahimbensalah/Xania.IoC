@@ -13,13 +13,11 @@ namespace Xania.IoC.Resolvers
             _registrations = new HashSet<IRegistry>();
         }
 
-        public virtual IResolvable Resolve(Type type)
+        public virtual IEnumerable<IResolvable> ResolveAll(Type type)
         {
             var implementationType = GetImlementationType(type);
-            if (implementationType == null)
-                return null;
-
-            return TypeResolvable.Create(implementationType);
+            if (implementationType != null)
+                yield return TypeResolvable.Create(implementationType);
         }
 
         public virtual Type GetImlementationType(Type sourceType)

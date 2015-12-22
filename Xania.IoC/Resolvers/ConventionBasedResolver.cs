@@ -22,13 +22,11 @@ namespace Xania.IoC.Resolvers
             _assemblies = new List<Assembly>(assemblies);
         }
 
-        public IResolvable Resolve(Type type)
+        public IEnumerable<IResolvable> ResolveAll(Type type)
         {
-            var implementationType  = GetImplementationType(type);
-            if (implementationType == null)
-                return null;
-
-            return TypeResolvable.Create(implementationType);
+            return
+                from implementationType in GetImplementationTypes(type)
+                select TypeResolvable.Create(implementationType);
         }
 
         private Type[] AllTypes
@@ -41,7 +39,7 @@ namespace Xania.IoC.Resolvers
             }
         }
 
-        private Type GetImplementationType(Type interfaceType)
+        private IEnumerable<Type> GetImplementationTypes(Type interfaceType)
         {
             var stack = new Stack<Type>();
             stack.Push(interfaceType);
@@ -57,11 +55,9 @@ namespace Xania.IoC.Resolvers
                 }
                 else
                 {
-                    return sourceType;
+                    yield return sourceType;
                 }
             }
-
-            return null;
         }
 
         public static IEnumerable<Type> GetInterfaces(Type type, bool includeInherited)

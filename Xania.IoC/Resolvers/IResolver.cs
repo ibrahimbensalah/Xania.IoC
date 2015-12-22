@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 
 namespace Xania.IoC.Resolvers
 {
     public interface IResolver
     {
-        IResolvable Resolve(Type type);
+        IEnumerable<IResolvable> ResolveAll(Type type);
     }
 }

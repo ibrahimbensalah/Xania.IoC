@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Xania.IoC.Resolvers
 {
@@ -19,13 +20,11 @@ namespace Xania.IoC.Resolvers
         {
         }
 
-        public IResolvable Resolve(Type type)
+        public virtual IEnumerable<IResolvable> ResolveAll(Type type)
         {
-            var resolvable = _resolver.Resolve(type);
-            if (resolvable == null)
-                return null;
-
-            return new PerScopeResolvable(type, resolvable, _scopeProvider);
+            return 
+                from resolvable in _resolver.ResolveAll(type)
+                select new PerScopeResolvable(type, resolvable, _scopeProvider);
         }
 
 

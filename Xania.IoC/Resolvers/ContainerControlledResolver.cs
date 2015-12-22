@@ -6,7 +6,7 @@ namespace Xania.IoC.Resolvers
 {
     public class ContainerControlledResolver: IResolver
     {
-        private readonly IDictionary<Type, InstanceResolvable> _resolvableCache = new Dictionary<Type, InstanceResolvable>();
+        private readonly IDictionary<Type, IEnumerable<InstanceResolvable>> _resolvableCache = new Dictionary<Type, IEnumerable<InstanceResolvable>>();
         private readonly IResolver _resolver;
 
         public ContainerControlledResolver(params IResolver[] resolvers)
@@ -19,23 +19,19 @@ namespace Xania.IoC.Resolvers
         /// </summary>
         /// <param name="type">service type to resolve</param>
         /// <returns></returns>
-        public IResolvable Resolve(Type type)
-        {
-            var observable = _resolver.Resolve(type);
-            if (observable == null)
-                return null;
-
-            return _resolvableCache.Get(type, () => new InstanceResolvable(observable));
-        }
-
         public IEnumerable<IResolvable> ResolveAll(Type type)
         {
-            return new[] {Resolve(type)};
+            return _resolvableCache.Get(type, () => _resolver.ResolveAll(type).Select(e => new InstanceResolvable(e)).ToArray());
         }
 
         public void Dispose(Type type)
         {
-            _resolvableCache.Dispose(type);
+            IEnumerable<InstanceResolvable> items;
+            if (_resolvableCache.TryGetValue(type, out items))
+            {
+                foreach(var i in items)
+                    i.Dispose();
+            }
         }
 
         public class InstanceResolvable : IResolvable, IDisposable

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
@@ -8,18 +9,26 @@ namespace Xania.IoC
 {
     public static class ResolverExtensions
     {
-        public static T Resolve<T>(this IObjectContainer container)
-        {
-            return (T) container.Resolve(typeof (T));
-        }
-
         public static T Resolve<T>(this IResolver resolver)
         {
-            var r = resolver.Resolve(typeof (T));
-            if (r == null)
-                throw new ResolutionFailedException(typeof(T));
+            return (T)resolver.Resolve(typeof(T));
+        }
 
-            return (T) resolver.Build(r);
+        public static IEnumerable<T> ResolveAll<T>(this IResolver resolver)
+        {
+            return resolver.ResolveAll(typeof(T)).Cast<T>();
+        }
+
+        public static object Resolve(this IResolver resolver, Type serviceType)
+        {
+            var resolvables = resolver.ResolveAll(serviceType).Select(res => res.Build(resolver)).Take(2).ToArray();
+            switch (resolvables.Count())
+            {
+                case 1:
+                    return resolvables[0];
+                default:
+                    throw new ResolutionFailedException(serviceType);
+            }
         }
 
         public static object Build(this IResolvable resolvable, IResolver resolver)
@@ -32,14 +41,9 @@ namespace Xania.IoC
             if (resolvable == null)
                 return null;
 
-            var args = resolvable.GetDependencies().Select(d =>
-            {
-                var r = resolver.Resolve(d);
-                if (r == null)
-                    throw new ResolutionFailedException(d);
-                return resolver.Build(r);
-            });
-            return resolvable.Create(args.ToArray());
+            var args = resolvable.GetDependencies().Select(resolver.Resolve).ToArray();
+
+            return resolvable.Create(args);
         }
 
         public static TransientResolver Register<TSource>(this TransientResolver transientResolver)

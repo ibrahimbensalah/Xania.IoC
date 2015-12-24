@@ -17,11 +17,11 @@ namespace Xania.IoC.Resolvers
         /// <summary>
         /// Resolve to InstanceResolver to prevent injecting dependencies from resolvers in higher hierarchy
         /// </summary>
-        /// <param name="type">service type to resolve</param>
+        /// <param name="serviceType">service type to resolve</param>
         /// <returns></returns>
-        public IEnumerable<IResolvable> ResolveAll(Type type)
+        public IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
-            return _resolvableCache.Get(type, () => _resolver.ResolveAll(type).Select(e => new InstanceResolvable(e)).ToArray());
+            return _resolvableCache.Get(serviceType, () => _resolver.ResolveAll(serviceType).Select(e => new InstanceResolvable(e)).ToArray());
         }
 
         public void Dispose(Type type)

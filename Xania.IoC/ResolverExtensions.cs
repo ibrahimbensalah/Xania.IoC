@@ -46,10 +46,10 @@ namespace Xania.IoC
             return resolvable.Create(args);
         }
 
-        public static TransientResolver Register<TSource>(this TransientResolver transientResolver)
+        public static RegistryResolver Register<TSource>(this RegistryResolver registryResolver)
         {
-            transientResolver.Register(typeof(TSource));
-            return transientResolver;
+            registryResolver.Register(typeof(TSource));
+            return registryResolver;
         }
 
         public static PerScopeResolver PerScope(this IResolver resolver, IScopeProvider scopeProvider)

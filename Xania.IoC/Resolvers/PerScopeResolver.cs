@@ -20,11 +20,11 @@ namespace Xania.IoC.Resolvers
         {
         }
 
-        public virtual IEnumerable<IResolvable> ResolveAll(Type type)
+        public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
             return 
-                from resolvable in _resolver.ResolveAll(type)
-                select new PerScopeResolvable(type, resolvable, _scopeProvider);
+                from resolvable in _resolver.ResolveAll(serviceType)
+                select new PerScopeResolvable(serviceType, resolvable, _scopeProvider);
         }
 
 

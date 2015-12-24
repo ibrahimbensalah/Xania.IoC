@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
@@ -10,7 +11,7 @@ namespace Xania.IoC.Tests
         [Test]
         public void Resolver_returns_null()
         {
-            var resolver = new ContainerControlledResolver(new TransientResolver());
+            var resolver = new ContainerControlledResolver(new RegistryResolver());
 
             resolver.ResolveAll(typeof(IProductService)).Should().BeEmpty();
         }
@@ -18,7 +19,7 @@ namespace Xania.IoC.Tests
         [Test]
         public void Resolver_returns_instance()
         {
-            var resolver = new TransientResolver()
+            var resolver = new RegistryResolver()
                 .Register<ProductService>()
                 .Register<DataContext>();
 
@@ -27,10 +28,24 @@ namespace Xania.IoC.Tests
                 .Should().NotBeNull();
         }
 
+        [TestCase(typeof(IProductService), typeof(IProductService), typeof(IProductService))]
+        [TestCase(typeof(IProductService), typeof(ProductService), typeof(ProductService))]
+        [TestCase(typeof(IRepository<int>), typeof(IRepository<>), typeof(IRepository<int>))]
+        [TestCase(typeof(IRepository<int>), typeof(MemoryRepository<>), typeof(MemoryRepository<int>))]
+        public void RegistryResolver_can_map_to_generic_type_definitions(Type sourceType, Type templateType, Type expectedType)
+        {
+            // var resolver = new RegistryResolver();
+            // resolver.Register(typeof (MemoryRepository<>));
+            // resolver.Resolve<IRepository<int>>().Should().BeOfType<MemoryRepository<int>>();
+            // typeof (IProductService).GetImplementationType(typeof (ProductService)).Should().Be(typeof (ProductService));
+
+            sourceType.MapTo(templateType).Should().Be(expectedType);
+        }
+
         [Test]
         public void Resolver_throws_when_unable_to_resolve_underlying_dependencies()
         {
-            new TransientResolver()
+            new RegistryResolver()
                 .Register<ProductService>()
                 .Invoking(c => c.Resolve<ProductService>())
                 .ShouldThrow<ResolutionFailedException>();
@@ -41,8 +56,8 @@ namespace Xania.IoC.Tests
         {
             var resolver = new ResolverCollection
             {
-                new TransientResolver().Register<DataContext>(),
-                new TransientResolver().Register<ProductService>()
+                new RegistryResolver().Register<DataContext>(),
+                new RegistryResolver().Register<ProductService>()
             };
 
             resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
@@ -62,7 +77,7 @@ namespace Xania.IoC.Tests
         [Test]
         public void TransientObjectController_resolves_nonequal_instances()
         {
-            var container = new TransientResolver().Register<DataContext>();
+            var container = new RegistryResolver().Register<DataContext>();
 
             var instance1 = container.Resolve<DataContext>();
             var instance2 = container.Resolve<DataContext>();

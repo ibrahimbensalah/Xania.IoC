@@ -22,10 +22,10 @@ namespace Xania.IoC.Resolvers
             _assemblies = new List<Assembly>(assemblies);
         }
 
-        public IEnumerable<IResolvable> ResolveAll(Type type)
+        public IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
             return
-                from implementationType in GetImplementationTypes(type)
+                from implementationType in GetImplementationTypes(serviceType)
                 select TypeResolvable.Create(implementationType);
         }
 
@@ -48,9 +48,9 @@ namespace Xania.IoC.Resolvers
             {
                 var sourceType = stack.Pop();
 
-                if (sourceType.IsInterface || sourceType.IsAbstract || sourceType.GetConstructors().Length == 0)
+                if (sourceType.IsConcrete())
                 {
-                    foreach (var subtype in AllTypes.Where(t => GetInterfaces(t, false).Contains(sourceType) || t.BaseType == sourceType))
+                    foreach (var subtype in AllTypes.Where(t => t.GetInterfaces(false).Contains(sourceType) || t.BaseType == sourceType))
                         stack.Push(subtype);
                 }
                 else
@@ -58,14 +58,6 @@ namespace Xania.IoC.Resolvers
                     yield return sourceType;
                 }
             }
-        }
-
-        public static IEnumerable<Type> GetInterfaces(Type type, bool includeInherited)
-        {
-            if (includeInherited || type.BaseType == null)
-                return type.GetInterfaces();
-            else
-                return type.GetInterfaces().Except(type.BaseType.GetInterfaces());
         }
     }
 }

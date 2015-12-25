@@ -16,11 +16,7 @@ namespace Xania.IoC
 
         public static object GetService(this IResolver resolver, Type serviceType)
         {
-            var instance = resolver.GetServices(serviceType).FirstOrDefault();
-            if (instance == null) 
-                throw new ResolutionFailedException(serviceType);
-
-            return instance;
+            return resolver.GetServices(serviceType).FirstOrDefault();
         }
 
         public static IEnumerable<T> GetServices<T>(this IResolver resolver)
@@ -40,7 +36,13 @@ namespace Xania.IoC
 
         public static object Build(this IResolver resolver, IResolvable resolvable)
         {
-            var args = resolvable.GetDependencies().Select(resolver.GetService).ToArray();
+            var args = resolvable.GetDependencies().Select(t =>
+            {
+                var instance = resolver.GetService(t);
+                if (instance == null)
+                    throw new ResolutionFailedException(t);
+                return instance;
+            }).ToArray();
             return resolvable.Create(args);
         }
 

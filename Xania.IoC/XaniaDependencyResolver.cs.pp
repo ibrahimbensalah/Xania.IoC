@@ -22,14 +22,16 @@ namespace $defaultNamespace$
 
     public class XaniaDependencyResolver : ResolverCollection, IDependencyResolver
     {
+		IResolver Resolver { get { return this; } }
+
         public virtual object GetService(Type serviceType)
         {
-            return (this as IResolver).GetServices(serviceType).FirstOrDefault();
+            return Resolver.GetService(serviceType);
         }
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return (this as IResolver).GetServices(serviceType);
+            return Resolver.GetServices(serviceType);
         }
     }
 }

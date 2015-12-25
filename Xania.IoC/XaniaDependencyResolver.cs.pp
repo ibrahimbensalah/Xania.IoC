@@ -24,7 +24,7 @@ namespace $defaultNamespace$
     {
         public virtual object GetService(Type serviceType)
         {
-            return (this as IResolver).GetService(serviceType);
+            return (this as IResolver).GetServices(serviceType).FirstOrDefault();
         }
 
         public IEnumerable<object> GetServices(Type serviceType)

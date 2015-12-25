@@ -48,7 +48,7 @@ namespace Xania.IoC.Resolvers
             {
                 var sourceType = stack.Pop();
 
-                if (sourceType.IsConcrete())
+                if (!sourceType.IsConcrete())
                 {
                     foreach (var subtype in AllTypes.Where(t => t.GetInterfaces(false).Contains(sourceType) || t.BaseType == sourceType))
                         stack.Push(subtype);

@@ -18,7 +18,7 @@ namespace Xania.IoC
 
         public static bool IsConcrete(this Type type)
         {
-            return (type.IsInterface || type.IsAbstract || type.GetConstructors().Length == 0);
+            return !(type.IsInterface || type.IsAbstract || type.GetConstructors().Length == 0);
         }
 
     }

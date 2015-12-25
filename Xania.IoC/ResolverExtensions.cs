@@ -16,14 +16,11 @@ namespace Xania.IoC
 
         public static object GetService(this IResolver resolver, Type serviceType)
         {
-            var resolvables = resolver.GetServices(serviceType).Take(2).ToArray();
-            switch (resolvables.Count())
-            {
-                case 1:
-                    return resolvables[0];
-                default:
-                    throw new ResolutionFailedException(serviceType);
-            }
+            var instance = resolver.GetServices(serviceType).FirstOrDefault();
+            if (instance == null) 
+                throw new ResolutionFailedException(serviceType);
+
+            return instance;
         }
 
         public static IEnumerable<T> GetServices<T>(this IResolver resolver)

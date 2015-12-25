@@ -14,12 +14,12 @@ namespace Xania.IoC.Resolvers
             _list = new List<IResolver>(resolvers);
         }
 
-        public IEnumerable<IResolvable> ResolveAll(Type serviceType)
+        public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
             return _list.SelectMany(r => r.ResolveAll(serviceType)).Where(r => r != null);
         }
 
-        public void Add(IResolver resolver)
+        public virtual void Add(IResolver resolver)
         {
             _list.Add(resolver);
         }

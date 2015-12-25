@@ -35,15 +35,16 @@ namespace Xania.IoC
 
         public static TypeResolvable Create(Type implementationType)
         {
-            var ctor = implementationType
-                .GetConstructors()
-                .OrderByDescending(e => e.GetParameters().Length)
-                .FirstOrDefault();
+            var q =
+                from ctor in implementationType.GetConstructors()
+                where ctor.GetParameters().All(p => p.ParameterType.IsClass || p.ParameterType.IsInterface)
+                orderby ctor.GetParameters().Length descending 
+                select ctor;
 
-            if (ctor == null)
-                return null;
+            if (q.Any())
+                return new TypeResolvable(implementationType, q.FirstOrDefault());
 
-            return new TypeResolvable(implementationType, ctor);
+            return null;
         }
     }
 }

@@ -21,38 +21,5 @@ namespace Xania.IoC
             return (type.IsInterface || type.IsAbstract || type.GetConstructors().Length == 0);
         }
 
-
-        public static Type MapTo(this Type sourceType, Type targetType)
-        {
-            if (sourceType.IsGenericTypeDefinition)
-                throw new ArgumentException("sourceType cannot be a generic type definition");
-
-            if (sourceType.IsAssignableFrom(targetType))
-                return targetType;
-
-            if (!targetType.IsGenericTypeDefinition)
-                return null;
-
-            if (sourceType.IsGenericType)
-            {
-                if (targetType.GetGenericTypeDefinition() == sourceType.GetGenericTypeDefinition())
-                {
-                    return targetType.MakeGenericType(sourceType.GenericTypeArguments);
-                }
-
-                foreach (var i in targetType.GetInterfaces(false))
-                {
-                    if (i.IsGenericType && (i.GetGenericTypeDefinition() == sourceType.GetGenericTypeDefinition()))
-                    {
-                        
-                    }
-
-                }
-                    
-            }
-
-            return null;
-        }
-
     }
 }

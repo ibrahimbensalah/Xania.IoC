@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
 using Xania.IoC.Containers;
@@ -28,18 +29,16 @@ namespace Xania.IoC.Tests
                 .Should().NotBeNull();
         }
 
-        [TestCase(typeof(IProductService), typeof(IProductService), typeof(IProductService))]
         [TestCase(typeof(IProductService), typeof(ProductService), typeof(ProductService))]
-        [TestCase(typeof(IRepository<int>), typeof(IRepository<>), typeof(IRepository<int>))]
         [TestCase(typeof(IRepository<int>), typeof(MemoryRepository<>), typeof(MemoryRepository<int>))]
+        [TestCase(typeof(IMap<int, int>), typeof(Map<,>), typeof(Map<int, int>))]
         public void RegistryResolver_can_map_to_generic_type_definitions(Type sourceType, Type templateType, Type expectedType)
         {
-            // var resolver = new RegistryResolver();
-            // resolver.Register(typeof (MemoryRepository<>));
-            // resolver.Resolve<IRepository<int>>().Should().BeOfType<MemoryRepository<int>>();
-            // typeof (IProductService).GetImplementationType(typeof (ProductService)).Should().Be(typeof (ProductService));
+            var resolver = new RegistryResolver()
+                .Register<DataContext>();
+            resolver.Register(templateType);
 
-            sourceType.MapTo(templateType).Should().Be(expectedType);
+            resolver.Resolve(sourceType).Should().BeOfType(expectedType);
         }
 
         [Test]
@@ -147,5 +146,13 @@ namespace Xania.IoC.Tests
             resolver.Resolve<IntegerRepository>().Should().BeOfType<IntegerRepository>();
         }
 
+    }
+
+    public class Map<T, T1>: IMap<T, T1>
+    {
+    }
+
+    public interface IMap<T, T1>
+    {
     }
 }

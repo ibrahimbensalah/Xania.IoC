@@ -15,48 +15,51 @@ namespace Xania.IoC.Resolvers
 
         public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
-            return from implementationType in GetImlementationTypes(serviceType)
+            var implementationTypes = GetImlementationTypes(serviceType).ToArray();
+            return from implementationType in implementationTypes
                    select TypeResolvable.Create(implementationType);
         }
 
         public virtual IEnumerable<Type> GetImlementationTypes(Type serviceType)
         {
             return
-                from registration in _registrations.Where(r => r.IsMatch(serviceType, null))
-                select registration.ServiceType;
+                from registration in _registrations
+                let concreteType = GetConcreteType(registration.ServiceType, serviceType)
+                where concreteType != null
+                select concreteType;
+        }
+
+        private Type GetConcreteType(Type serviceType, Type baseType)
+        {
+            if (serviceType.ContainsGenericParameters)
+                serviceType = serviceType.MakeGenericType(baseType.GenericTypeArguments);
+
+            if (baseType.IsAssignableFrom(serviceType))
+                return serviceType;
+
+            return null;
         }
 
         private interface IRegistry
         {
-            bool IsMatch(Type type, string name);
-
+            string Name { get; }
             Type ServiceType { get; }
         }
 
         private sealed class TypeRegistry: IRegistry
         {
-            private string Name { get; set; }
+            public string Name { get; private set; }
 
             public TypeRegistry(Type serviceType, string name)
             {
                 if (serviceType == null) 
                     throw new ArgumentNullException("serviceType");
-                if (name == null) 
-                    throw new ArgumentNullException("name");
 
                 Name = name;
                 ServiceType = serviceType;
             }
 
             public Type ServiceType { get; private set; }
-
-            public bool IsMatch(Type type, string name)
-            {
-                // type.GetInterfaces(false).Contains(sourceType) || t.BaseType == sourceType;
-
-                return type.IsAssignableFrom(ServiceType) &&
-                       string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
-            }
 
             // override object.Equals
             public override bool Equals(object obj)

@@ -22,7 +22,7 @@ namespace $defaultNamespace$
 
 		protected virtual IResolver GetPerRequestResolver() 
 		{
-			return new TransientResolver()
+			return new RegistryResolver()
 	            // TODO: register here per request types
 				// .Register<DataContext>()
 				;
@@ -50,15 +50,12 @@ namespace $defaultNamespace$
 
         public virtual object GetService(Type serviceType)
         {
-            return Resolver.Resolve(serviceType).Build(Resolver);
+            return Resolver.GetService(serviceType);
         }
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            var instance =  Resolver.Resolve(serviceType).Build(Resolver);
-            if (instance == null)
-                return Enumerable.Empty<object>();
-            return new[] {instance};
+            return Resolver.GetServices(serviceType);
         }
     }
 }

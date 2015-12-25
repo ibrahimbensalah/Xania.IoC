@@ -25,7 +25,7 @@ namespace Xania.IoC.Tests
                 .Register<DataContext>();
 
             resolver
-                .Resolve<IProductService>()
+                .GetService<IProductService>()
                 .Should().NotBeNull();
         }
 
@@ -38,7 +38,7 @@ namespace Xania.IoC.Tests
                 .Register<DataContext>();
             resolver.Register(templateType);
 
-            resolver.Resolve(sourceType).Should().BeOfType(expectedType);
+            resolver.GetService(sourceType).Should().BeOfType(expectedType);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace Xania.IoC.Tests
         {
             new RegistryResolver()
                 .Register<ProductService>()
-                .Invoking(c => c.Resolve<ProductService>())
+                .Invoking(c => c.GetService<ProductService>())
                 .ShouldThrow<ResolutionFailedException>();
         }
 
@@ -59,7 +59,7 @@ namespace Xania.IoC.Tests
                 new RegistryResolver().Register<ProductService>()
             };
 
-            resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
+            resolver.GetService<IProductService>().Should().BeOfType<ProductService>();
         }
 
         [Test]
@@ -67,8 +67,8 @@ namespace Xania.IoC.Tests
         {
             var container = new ContainerControlledResolver(new ConventionBasedResolver());
 
-            var instance1 = container.Resolve<DataContext>();
-            var instance2 = container.Resolve<DataContext>();
+            var instance1 = container.GetService<DataContext>();
+            var instance2 = container.GetService<DataContext>();
 
             instance1.Should().BeSameAs(instance2);
         }
@@ -78,8 +78,8 @@ namespace Xania.IoC.Tests
         {
             var container = new RegistryResolver().Register<DataContext>();
 
-            var instance1 = container.Resolve<DataContext>();
-            var instance2 = container.Resolve<DataContext>();
+            var instance1 = container.GetService<DataContext>();
+            var instance2 = container.GetService<DataContext>();
 
             instance1.Should().NotBe(instance2);
         }
@@ -93,8 +93,8 @@ namespace Xania.IoC.Tests
                 new ConventionBasedResolver()
             };
 
-            resolver.Resolve<IProductService>().Should().BeOfType<ProductService>();
-            resolver.Resolve<IDataContext>().Should().BeOfType<DataContext>();
+            resolver.GetService<IProductService>().Should().BeOfType<ProductService>();
+            resolver.GetService<IDataContext>().Should().BeOfType<DataContext>();
         }
 
         public class SubDataContext: DataContext
@@ -105,13 +105,13 @@ namespace Xania.IoC.Tests
         public void DisposeTests()
         {
             var resolver = new ContainerControlledResolver(new ConventionBasedResolver());
-            var productService = resolver.Resolve<IProductService>();
-            resolver.Resolve<IProductService>().Should().BeSameAs(productService);
+            var productService = resolver.GetService<IProductService>();
+            resolver.GetService<IProductService>().Should().BeSameAs(productService);
 
             resolver.Dispose(typeof(IProductService));
             productService.IsDisposed.Should().BeTrue();
 
-            resolver.Resolve<IProductService>().Should().NotBeSameAs(productService);
+            resolver.GetService<IProductService>().Should().NotBeSameAs(productService);
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace Xania.IoC.Tests
             var scopeProvider = new ScopeProvider();
             var resolver = new PerScopeResolver(scopeProvider, new ConventionBasedResolver());
 
-            var proxy = resolver.Resolve<IDataContext>();
+            var proxy = resolver.GetService<IDataContext>();
             var id = proxy.Id;
             proxy.Id.Should().Be(id);
 
@@ -136,14 +136,14 @@ namespace Xania.IoC.Tests
         {
             var resolver = new IdentityResolver().For<IDataContext>();
 
-            resolver.Resolve<DataContext>().Should().BeOfType<DataContext>();
+            resolver.GetService<DataContext>().Should().BeOfType<DataContext>();
         }
 
         [Test]
         public void Should_be_able_to_resolve_generics()
         {
             var resolver = new IdentityResolver().For(typeof (MemoryRepository<>));
-            resolver.Resolve<IntegerRepository>().Should().BeOfType<IntegerRepository>();
+            resolver.GetService<IntegerRepository>().Should().BeOfType<IntegerRepository>();
         }
 
     }

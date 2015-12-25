@@ -9,19 +9,14 @@ namespace Xania.IoC
 {
     public static class ResolverExtensions
     {
-        public static T Resolve<T>(this IResolver resolver)
+        public static T GetService<T>(this IResolver resolver)
         {
-            return (T)resolver.Resolve(typeof(T));
+            return (T)resolver.GetService(typeof(T));
         }
 
-        public static IEnumerable<T> ResolveAll<T>(this IResolver resolver)
+        public static object GetService(this IResolver resolver, Type serviceType)
         {
-            return resolver.ResolveAll(typeof(T)).Cast<T>();
-        }
-
-        public static object Resolve(this IResolver resolver, Type serviceType)
-        {
-            var resolvables = resolver.ResolveAll(serviceType).Select(res => res.Build(resolver)).Take(2).ToArray();
+            var resolvables = resolver.GetServices(serviceType).Take(2).ToArray();
             switch (resolvables.Count())
             {
                 case 1:
@@ -31,6 +26,16 @@ namespace Xania.IoC
             }
         }
 
+        public static IEnumerable<T> GetServices<T>(this IResolver resolver)
+        {
+            return resolver.GetServices(typeof(T)).Cast<T>();
+        }
+
+        public static IEnumerable<object> GetServices(this IResolver resolver, Type serviceType)
+        {
+            return resolver.ResolveAll(serviceType).Select(resolver.Build);
+        }
+
         public static object Build(this IResolvable resolvable, IResolver resolver)
         {
             return resolver.Build(resolvable);
@@ -38,11 +43,7 @@ namespace Xania.IoC
 
         public static object Build(this IResolver resolver, IResolvable resolvable)
         {
-            if (resolvable == null)
-                return null;
-
-            var args = resolvable.GetDependencies().Select(resolver.Resolve).ToArray();
-
+            var args = resolvable.GetDependencies().Select(resolver.GetService).ToArray();
             return resolvable.Create(args);
         }
 

@@ -16,7 +16,7 @@ namespace Xania.IoC.Resolvers
 
         public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
-            return _list.SelectMany(r => r.ResolveAll(serviceType)).Where(r => r != null);
+            return this.SelectMany(r => r.ResolveAll(serviceType)).Where(r => r != null);
         }
 
         public virtual void Add(IResolver resolver)
@@ -26,7 +26,10 @@ namespace Xania.IoC.Resolvers
 
         public IEnumerator<IResolver> GetEnumerator()
         {
-            return _list.GetEnumerator();
+            for (int i = _list.Count - 1; i >= 0; i--)
+            {
+                yield return _list[i];
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

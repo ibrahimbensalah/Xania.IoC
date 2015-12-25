@@ -8,54 +8,28 @@ using Xania.IoC.Resolvers;
 
 namespace $defaultNamespace$
 {
-    public class XaniaDependencyResolver : IDependencyResolver
+    public class PerRequestScopeProvider: ScopeProvider
     {
-        public XaniaDependencyResolver(MvcApplication mvcApplication)
+        public PerRequestScopeProvider(MvcApplication mvcApplication)
+            : base(() => HttpContext.Current.Items)
         {
-			PerRequestScopeProvider = new ScopeProvider(() => HttpContext.Current.Items);
-
             mvcApplication.EndRequest += (sender, args) =>
             {
-	            PerRequestScopeProvider.Get().DisposeAll();
+                Release();
             };
         }
+    }
 
-		protected virtual IResolver GetPerRequestResolver() 
-		{
-			return new RegistryResolver()
-	            // TODO: register here per request types
-				// .Register<DataContext>()
-				;
-		}
-
-		public IScopeProvider PerRequestScopeProvider { get; private set; }
-
-		private IResolver _resolver;
-        public IResolver Resolver
-        {
-            get
-            {
-                if (_resolver == null)
-                {
-                    _resolver = new ResolverCollection
-					{
-						new ContainerControlledResolver(new ConventionBasedResolver()),
-						new IdentityResolver().For<Controller>(),
-						GetPerRequestResolver().PerScope(PerRequestScopeProvider),
-					};
-                }
-                return _resolver;
-            }
-        }
-
+    public class XaniaDependencyResolver : ResolverCollection, IDependencyResolver
+    {
         public virtual object GetService(Type serviceType)
         {
-            return Resolver.GetService(serviceType);
+            return (this as IResolver).GetService(serviceType);
         }
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return Resolver.GetServices(serviceType);
+            return (this as IResolver).GetServices(serviceType);
         }
     }
 }

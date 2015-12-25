@@ -30,15 +30,14 @@ namespace Xania.IoC.Resolvers
             return true;
         }
 
-        public static void DisposeAll<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, bool clearAll = true)
+        public static void DisposeAll<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
         {
             if (dictionary != null)
             {
                 foreach (var item in dictionary.Values.OfType<IDisposable>())
                     item.Dispose();
 
-                if (clearAll)
-                    dictionary.Clear();
+                dictionary.Clear();
             }
         }
 

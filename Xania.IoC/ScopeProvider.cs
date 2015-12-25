@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Xania.IoC.Resolvers;
 
 namespace Xania.IoC
 {
@@ -31,15 +32,25 @@ namespace Xania.IoC
             _id = Guid.NewGuid();
         }
 
-        public IDictionary<Type, object> Get()
+        public virtual void Release()
         {
-            var items = _backingStore();
-            if (!items.Contains(_id))
+            var backingStore = _backingStore();
+            if (!backingStore.Contains(_id))
             {
-                items[_id] = new Dictionary<Type, object>();
+                var items = (IDictionary<Type, object>)backingStore[_id];
+                items.DisposeAll();
+            }
+        }
+
+        public virtual IDictionary<Type, object> Get()
+        {
+            var backingStore = _backingStore();
+            if (!backingStore.Contains(_id))
+            {
+                backingStore[_id] = new Dictionary<Type, object>();
             }
 
-            return (IDictionary<Type, object>)items[_id];
+            return (IDictionary<Type, object>)backingStore[_id];
         }
     }
 }

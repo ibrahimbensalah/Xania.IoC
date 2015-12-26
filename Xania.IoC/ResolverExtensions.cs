@@ -7,60 +7,69 @@ using Xania.IoC.Resolvers;
 
 namespace Xania.IoC
 {
-    public static class ResolverExtensions
-    {
-        public static T GetService<T>(this IResolver resolver)
-        {
-            return (T)resolver.GetService(typeof(T));
-        }
+	public static class ResolverExtensions
+	{
+		public static T GetService<T>(this IResolver resolver)
+		{
+			return (T)resolver.GetService(typeof(T));
+		}
 
-        public static object GetService(this IResolver resolver, Type serviceType)
-        {
-            return resolver.GetServices(serviceType).FirstOrDefault();
-        }
+		public static object GetService(this IResolver resolver, Type serviceType)
+		{
+			return resolver.GetServices(serviceType).FirstOrDefault();
+		}
 
-        public static IEnumerable<T> GetServices<T>(this IResolver resolver)
-        {
-            return resolver.GetServices(typeof(T)).Cast<T>();
-        }
+		public static IEnumerable<T> GetServices<T>(this IResolver resolver)
+		{
+			return resolver.GetServices(typeof(T)).Cast<T>();
+		}
 
-        public static IEnumerable<object> GetServices(this IResolver resolver, Type serviceType)
-        {
-            return resolver.ResolveAll(serviceType).Select(resolver.Build);
-        }
+		public static IEnumerable<object> GetServices(this IResolver resolver, Type serviceType)
+		{
+			return resolver.ResolveAll(serviceType).Select(resolver.Build);
+		}
 
-        public static object Build(this IResolvable resolvable, IResolver resolver)
-        {
-            return resolver.Build(resolvable);
-        }
+		public static object Build(this IResolvable resolvable, IResolver resolver)
+		{
+			return resolver.Build(resolvable);
+		}
 
-        public static object Build(this IResolver resolver, IResolvable resolvable)
-        {
-            var args = resolvable.GetDependencies().Select(t =>
-            {
-                var instance = resolver.GetService(t);
-                if (instance == null)
-                    throw new ResolutionFailedException(t);
-                return instance;
-            }).ToArray();
-            return resolvable.Create(args);
-        }
+		public static object Build(this IResolver resolver, IResolvable resolvable)
+		{
+			var args = resolvable.GetDependencies().Select(t =>
+			{
+				object instance;
+				try
+				{
+					instance = resolver.GetService(t);
+				}
+				catch (ResolutionFailedException ex)
+				{
+					ex.Types.Add(resolvable.ServiceType);
+					throw;
+				}
+				if (instance == null)
+					throw new ResolutionFailedException(t, resolvable.ServiceType);
+				return instance;
+			}).ToArray();
+			return resolvable.Create(args);
+		}
 
-        public static RegistryResolver Register<TSource>(this RegistryResolver registryResolver)
-        {
-            registryResolver.Register(typeof(TSource));
-            return registryResolver;
-        }
+		public static RegistryResolver Register<TSource>(this RegistryResolver registryResolver)
+		{
+			registryResolver.Register(typeof(TSource));
+			return registryResolver;
+		}
 
-        public static PerScopeResolver PerScope(this IResolver resolver, IScopeProvider scopeProvider)
-        {
-            return new PerScopeResolver(scopeProvider, resolver);
-        }
+		public static PerScopeResolver PerScope(this IResolver resolver, IScopeProvider scopeProvider)
+		{
+			return new PerScopeResolver(scopeProvider, resolver);
+		}
 
-        public static PerScopeResolver PerScope(this IResolver resolver, Func<IDictionary> backingStore)
-        {
-            var scopeProvider = new ScopeProvider(backingStore);
-            return new PerScopeResolver(scopeProvider, resolver);
-        }
-    }
+		public static PerScopeResolver PerScope(this IResolver resolver, Func<IDictionary> backingStore)
+		{
+			var scopeProvider = new ScopeProvider(backingStore);
+			return new PerScopeResolver(scopeProvider, resolver);
+		}
+	}
 }

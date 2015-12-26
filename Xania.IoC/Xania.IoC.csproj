@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CachingExtensions.cs" />
     <Compile Include="Resolvers\ContainerControlledResolver.cs" />
     <Compile Include="Resolvers\ConventionBasedResolver.cs" />
     <Compile Include="Containers\ObjectContainer.cs" />

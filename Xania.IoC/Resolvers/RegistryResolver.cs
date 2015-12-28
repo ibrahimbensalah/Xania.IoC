@@ -15,51 +15,40 @@ namespace Xania.IoC.Resolvers
 
         public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
-            var implementationTypes = GetImlementationTypes(serviceType).ToArray();
-            return from implementationType in implementationTypes
-                   select TypeResolvable.Create(implementationType);
+            return
+                from concreteType in _registrations.Select(r => r.TemplateType.MapTo(serviceType))
+                where concreteType != null
+                select TypeResolvable.Create(concreteType);
         }
 
-        public virtual IEnumerable<Type> GetImlementationTypes(Type serviceType)
+        public virtual IEnumerable<Type> GetImlementationTypes(Type targetType)
         {
             return
-                from registration in _registrations
-                let concreteType = GetConcreteType(registration.ServiceType, serviceType)
+                from concreteType in _registrations.Select(r => r.TemplateType.MapTo(targetType))
                 where concreteType != null
                 select concreteType;
-        }
-
-        private Type GetConcreteType(Type serviceType, Type baseType)
-        {
-            if (serviceType.ContainsGenericParameters)
-                serviceType = serviceType.MakeGenericType(baseType.GenericTypeArguments);
-
-            if (baseType.IsAssignableFrom(serviceType))
-                return serviceType;
-
-            return null;
         }
 
         private interface IRegistry
         {
             string Name { get; }
-            Type ServiceType { get; }
+            Type TemplateType { get; }
         }
 
         private sealed class TypeRegistry: IRegistry
         {
             public string Name { get; private set; }
 
-            public TypeRegistry(Type serviceType, string name)
+            public TypeRegistry(Type templateType, string name)
             {
-                if (serviceType == null) 
-                    throw new ArgumentNullException("serviceType");
+                if (templateType == null) 
+                    throw new ArgumentNullException("templateType");
 
                 Name = name;
-                ServiceType = serviceType;
+                TemplateType = templateType;
             }
 
-            public Type ServiceType { get; private set; }
+            public Type TemplateType { get; private set; }
 
             // override object.Equals
             public override bool Equals(object obj)
@@ -75,13 +64,13 @@ namespace Xania.IoC.Resolvers
 
             public bool Equals(TypeRegistry typeRegistry)
             {
-                return typeRegistry.ServiceType == ServiceType &&
+                return typeRegistry.TemplateType == TemplateType &&
                        string.Equals(Name, typeRegistry.Name, StringComparison.OrdinalIgnoreCase);
             }
 
             public override int GetHashCode()
             {
-                return ServiceType.GetHashCode() + (Name == null ? 0 : Name.GetHashCode());
+                return TemplateType.GetHashCode() + (Name == null ? 0 : Name.GetHashCode());
             }
         }
 

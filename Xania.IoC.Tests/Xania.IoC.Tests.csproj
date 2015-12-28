@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="ProductService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeMappingTests.cs" />
     <Compile Include="ResolvableTests.cs" />
   </ItemGroup>
   <ItemGroup>

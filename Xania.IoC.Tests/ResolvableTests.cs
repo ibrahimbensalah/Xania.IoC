@@ -29,18 +29,6 @@ namespace Xania.IoC.Tests
 				.Should().NotBeNull();
 		}
 
-		[TestCase(typeof(IProductService), typeof(ProductService), typeof(ProductService))]
-		[TestCase(typeof(IRepository<int>), typeof(MemoryRepository<>), typeof(MemoryRepository<int>))]
-		[TestCase(typeof(IMap<int, int>), typeof(Map<,>), typeof(Map<int, int>))]
-		public void RegistryResolver_can_map_to_generic_type_definitions(Type sourceType, Type templateType, Type expectedType)
-		{
-			var resolver = new RegistryResolver()
-				.Register<DataContext>();
-			resolver.Register(templateType);
-
-			resolver.GetService(sourceType).Should().BeOfType(expectedType);
-		}
-
 		[Test]
 		public void Resolver_throws_when_unable_to_resolve_underlying_dependencies()
 		{
@@ -163,7 +151,6 @@ namespace Xania.IoC.Tests
 					typeof(IDataContext), typeof(ProductService), typeof(ProductController) });
 			}
 		}
-
 	}
 
 	public class ProductController

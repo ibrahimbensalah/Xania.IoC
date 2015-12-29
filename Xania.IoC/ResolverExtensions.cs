@@ -66,10 +66,9 @@ namespace Xania.IoC
 			return new PerScopeResolver(scopeProvider, resolver);
 		}
 
-		public static PerScopeResolver PerScope(this IResolver resolver, Func<IDictionary> backingStore)
+		public static PerScopeResolver PerScope(this IResolver resolver, Func<IDictionary<Type, object>> backingStore)
 		{
-			var scopeProvider = new ScopeProvider(backingStore);
-			return new PerScopeResolver(scopeProvider, resolver);
+		    return resolver.PerScope(new ScopeProvider(backingStore));
 		}
 	}
 }

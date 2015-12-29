@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Xania.IoC.Resolvers;
 
 namespace Xania.IoC
@@ -57,31 +56,6 @@ namespace Xania.IoC
                     dictionary[id] = (store = new Dictionary<Type, object>());
                 return store;
             };
-        }
-    }
-
-    internal interface IBackingStore
-    {
-        IDictionary<Type, object> Get();
-    }
-
-    internal class DictionaryBackingStore : IBackingStore
-    {
-        private readonly IDictionary _dictionary;
-        private readonly Guid _id;
-
-        public DictionaryBackingStore(IDictionary dictionary)
-        {
-            _dictionary = dictionary;
-            _id = Guid.NewGuid();
-        }
-
-        public IDictionary<Type, object> Get()
-        {
-            var store = _dictionary[_id] as IDictionary<Type, object>;
-            if (store == null)
-                _dictionary[_id] = (store = new Dictionary<Type, object>());
-            return store;
         }
     }
 }

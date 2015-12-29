@@ -4,56 +4,58 @@ using System.Linq;
 
 namespace Xania.IoC.Resolvers
 {
-    public class PerScopeResolver : IResolver
+    public class PerScopeResolver : ResolverCollection
     {
-        private readonly IResolver _resolver;
         private readonly IScopeProvider _scopeProvider;
 
-        public PerScopeResolver(IScopeProvider scopeProvider, IResolver resolver)
+        public PerScopeResolver()
+            : this(new ScopeProvider())
+        {
+        }
+
+        public PerScopeResolver(IScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
-            _resolver = resolver;
         }
 
-        public PerScopeResolver(IScopeProvider scopeProvider, params IResolver[] resolvers)
-            : this(scopeProvider, new ResolverCollection(resolvers))
+        public int Ha { get; set; }
+
+        public override IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
+            return base.ResolveAll(serviceType)
+                .Select(resolvable => new PerScopeResolvable(resolvable.ServiceType, () => GetOrCreate(resolvable)));
         }
 
-        public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
+        private object GetOrCreate(IResolvable resolvable)
         {
-            return 
-                from resolvable in _resolver.ResolveAll(serviceType)
-                select new PerScopeResolvable(serviceType, resolvable, _scopeProvider);
+            return _scopeProvider.Get().Get(resolvable.ServiceType, () => this.Build(resolvable));
         }
 
 
         public class PerScopeResolvable : IResolvable
         {
-            private readonly Type _type;
-            private readonly IResolvable _resolvable;
-            private readonly IScopeProvider _scopeProvider;
+            private readonly Func<object> _factory;
+            private readonly Type _serviceType;
 
-            public PerScopeResolvable(Type type, IResolvable resolvable, IScopeProvider scopeProvider)
+            public PerScopeResolvable(Type serviceType, Func<object> factory)
             {
-                _type = type;
-                _resolvable = resolvable;
-                _scopeProvider = scopeProvider;
+                _serviceType = serviceType;
+                _factory = factory;
             }
 
             public Type ServiceType
             {
-                get { return _resolvable.ServiceType; }
+                get { return _serviceType; }
             }
 
             public object Create(params object[] args)
             {
-                return new ScopeDecoraptor(_type, () => _resolvable.Create(args), _scopeProvider).GetTransparentProxy();
+                return _factory();
             }
 
             public IEnumerable<Type> GetDependencies()
             {
-                return _resolvable.GetDependencies();
+                return Enumerable.Empty<Type>();
             }
         }
     }

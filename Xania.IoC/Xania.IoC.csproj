@@ -55,7 +55,7 @@
     <Compile Include="Resolvers\PerScopeResolver.cs" />
     <Compile Include="Resolvers\ResolverCollection.cs" />
     <Compile Include="ResolverExtensions.cs" />
-    <Compile Include="Resolvers\ScopeDecoraptor.cs" />
+    <Compile Include="Resolvers\DecoraptorProxy.cs" />
     <Compile Include="Resolvers\IDentityResolver.cs" />
     <Compile Include="Resolvers\RegistryResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

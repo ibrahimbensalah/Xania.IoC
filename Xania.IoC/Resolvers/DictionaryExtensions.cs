@@ -15,6 +15,14 @@ namespace Xania.IoC.Resolvers
             return value;
         }
 
+        public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> cache, TKey key, Func<TKey, TValue> factory)
+        {
+            TValue value;
+            if (!cache.TryGetValue(key, out value))
+                cache.Add(key, value = factory(key));
+            return value;
+        }
+
         public static bool Dispose<TKey, TValue>(this IDictionary<TKey, TValue> cache, TKey key)
         {
             TValue value;

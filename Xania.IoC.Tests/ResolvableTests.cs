@@ -105,7 +105,7 @@ namespace Xania.IoC.Tests
 		public void PerScopeResolver_should_resolve_proxy_that_propagate_methodcall_to_object_in_scope()
 		{
 			var scopeProvider = new ScopeProvider();
-			var resolver = new PerScopeResolver(scopeProvider, new ConventionBasedResolver());
+		    var resolver = new PerScopeResolver(scopeProvider) {new ConventionBasedResolver()};
 
 			var proxy = resolver.GetService<IDataContext>();
 			var id = proxy.Id;
@@ -115,7 +115,8 @@ namespace Xania.IoC.Tests
 			proxy.Dispose();
 
 			// resolve after scope change
-			proxy.Id.Should().NotBe(id);
+			proxy.Id.Should().Be(id);
+		    proxy.IsDisposed.Should().BeTrue();
 		}
 
 		[Test]
@@ -132,6 +133,21 @@ namespace Xania.IoC.Tests
 			var resolver = new IdentityResolver().For(typeof(MemoryRepository<>));
 			resolver.GetService<IntegerRepository>().Should().BeOfType<IntegerRepository>();
 		}
+
+	    [Test]
+	    public void Should_throw_resolution_failed_exception_when_dependency_in_outer_scope()
+	    {
+	        var resolver = new PerScopeResolver // per request
+	        {
+                new RegistryResolver().Register<DataContext>(),
+	            new PerScopeResolver // per session
+	            {
+                    new RegistryResolver().Register<ProductService>(),
+	            }
+	        };
+
+	        resolver.Invoking(c => c.GetService(typeof (ProductService))).ShouldThrow<ResolutionFailedException>();
+	    }
 
 		[Test]
 		public void Should_report_resolve_path_on_error()

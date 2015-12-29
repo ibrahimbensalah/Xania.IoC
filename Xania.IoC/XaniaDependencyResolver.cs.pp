@@ -27,24 +27,17 @@ namespace $defaultNamespace$
     {
         public static IResolver PerRequest(this IResolver resolver, MvcApplication app)
         {
-            return resolver.PerScope(new PerRequestScopeProvider(app));
+            var scopeProvider = ScopeProvider.FromBackingStore(() => app.Context.Items);
+            app.EndRequest += (sender, args) =>
+            {
+                scopeProvider.Release();
+            };
+            return resolver.PerScope(scopeProvider);
         }
 
         public static IResolver PerSession(this IResolver resolver, MvcApplication app)
         {
-            return resolver.PerScope(new PerSessionScopeProvider(app));
-        }
-    }
-
-    public class PerRequestScopeProvider: ScopeProvider
-    {
-        public PerRequestScopeProvider(MvcApplication mvcApplication)
-            : base(() => HttpContext.Current.Items)
-        {
-            mvcApplication.EndRequest += (sender, args) =>
-            {
-                Release();
-            };
+            return resolver.PerScope(new PerSessionScopeProvider());
         }
     }
 

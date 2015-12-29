@@ -8,6 +8,8 @@ namespace Xania.IoC
 {
     public interface IScopeProvider
     {
+        void Release();
+
         IDictionary<Type, object> Get();
     }
 

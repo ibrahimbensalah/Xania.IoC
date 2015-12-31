@@ -50,6 +50,7 @@
     <Compile Include="Containers\IObjectContainer.cs" />
     <Compile Include="IResolvable.cs" />
     <Compile Include="Resolvers\DictionaryExtensions.cs" />
+    <Compile Include="Resolvers\InstanceResolvable.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="ResolutionFailedException.cs" />
     <Compile Include="Resolvers\PerScopeResolver.cs" />

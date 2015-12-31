@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using Xania.IoC.Containers;
@@ -137,16 +138,23 @@ namespace Xania.IoC.Tests
 	    [Test]
 	    public void Should_throw_resolution_failed_exception_when_dependency_in_outer_scope()
 	    {
+	        var registryResolver = new RegistryResolver().Register<DataContext>();
 	        var resolver = new PerScopeResolver // per request
 	        {
-                new RegistryResolver().Register<DataContext>(),
+                registryResolver,
 	            new PerScopeResolver // per session
 	            {
-                    new RegistryResolver().Register<ProductService>(),
+                    new RegistryResolver()
+                        .Register(new DataContextAdapter(() => registryResolver.GetService<IDataContext>()))
+                        .Register<ProductService>(),
 	            }
 	        };
 
-	        resolver.Invoking(c => c.GetService(typeof (ProductService))).ShouldThrow<ResolutionFailedException>();
+            var db = resolver.GetService<ProductService>().Db;
+            db.Should().BeOfType<DataContextAdapter>();
+
+	        resolver.GetService<ProductService>().Db.Should().Be(db);
+            resolver.GetService<IDataContext>().Should().Be(db);
 	    }
 
 		[Test]
@@ -163,13 +171,37 @@ namespace Xania.IoC.Tests
 			}
 			catch (ResolutionFailedException ex)
 			{
-				ex.Types.Should().BeEquivalentTo(new Type[] { 
-					typeof(IDataContext), typeof(ProductService), typeof(ProductController) });
+				ex.Types.Should().BeEquivalentTo(typeof(IDataContext), typeof(ProductService), typeof(ProductController));
 			}
 		}
 	}
 
-	public class ProductController
+    public class DataContextAdapter: IDataContext
+    {
+        private readonly Func<IDataContext> _dataContextFunc;
+
+        public DataContextAdapter(Func<IDataContext> dataContextFunc)
+        {
+            _dataContextFunc = dataContextFunc;
+        }
+
+        public void Dispose()
+        {
+            _dataContextFunc().Dispose();
+        }
+
+        public bool IsDisposed
+        {
+            get { return _dataContextFunc().IsDisposed; }
+        }
+
+        public Guid Id
+        {
+            get { return _dataContextFunc().Id; }
+        }
+    }
+
+    public class ProductController
 	{
 		public ProductController(ProductService productService)
 		{

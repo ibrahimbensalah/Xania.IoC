@@ -55,13 +55,19 @@ namespace Xania.IoC
 			return resolvable.Create(args);
 		}
 
-		public static RegistryResolver Register<TSource>(this RegistryResolver registryResolver)
-		{
-			registryResolver.Register(typeof(TSource));
-			return registryResolver;
-		}
+        public static RegistryResolver Register<TService>(this RegistryResolver registryResolver)
+        {
+            registryResolver.RegisterType(typeof(TService));
+            return registryResolver;
+        }
 
-		public static PerScopeResolver PerScope(this IResolver resolver, IScopeProvider scopeProvider)
+        public static RegistryResolver Register<TService>(this RegistryResolver registryResolver, TService instance)
+        {
+            registryResolver.RegisterInstance(instance);
+            return registryResolver;
+        }
+
+        public static PerScopeResolver PerScope(this IResolver resolver, IScopeProvider scopeProvider)
 		{
             return new PerScopeResolver(scopeProvider) { resolver };
 		}

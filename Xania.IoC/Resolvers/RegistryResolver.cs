@@ -16,28 +16,28 @@ namespace Xania.IoC.Resolvers
         public virtual IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
             return
-                from concreteType in _registrations.Select(r => r.TemplateType.MapTo(serviceType))
-                where concreteType != null
-                select TypeResolvable.Create(concreteType);
-        }
-
-        public virtual IEnumerable<Type> GetImlementationTypes(Type targetType)
-        {
-            return
-                from concreteType in _registrations.Select(r => r.TemplateType.MapTo(targetType))
-                where concreteType != null
-                select concreteType;
+                from resolvable in _registrations.Select(r => r.Resolve(serviceType))
+                where resolvable != null
+                select resolvable;
         }
 
         private interface IRegistry
         {
             string Name { get; }
-            Type TemplateType { get; }
+            IResolvable Resolve(Type targetType);
         }
 
         private sealed class TypeRegistry: IRegistry
         {
             public string Name { get; private set; }
+
+            public IResolvable Resolve(Type targetType)
+            {
+                var concreteType = TemplateType.MapTo(targetType);
+                if (concreteType != null)
+                    return TypeResolvable.Create(concreteType);
+                return null;
+            }
 
             public TypeRegistry(Type templateType, string name)
             {
@@ -48,7 +48,7 @@ namespace Xania.IoC.Resolvers
                 TemplateType = templateType;
             }
 
-            public Type TemplateType { get; private set; }
+            private Type TemplateType { get; set; }
 
             // override object.Equals
             public override bool Equals(object obj)
@@ -74,9 +74,47 @@ namespace Xania.IoC.Resolvers
             }
         }
 
-        public void Register(Type serviceType, string name = null)
+        public void RegisterType(Type serviceType, string name = null)
         {
             _registrations.Add(new TypeRegistry(serviceType, name));
+        }
+
+        public void RegisterInstance(object serviceInstance, string name = null)
+        {
+            _registrations.Add(new InstanceRegistry(serviceInstance, name));
+        }
+
+        private class InstanceRegistry: IRegistry, IResolvable
+        {
+            private readonly object _instance;
+
+            public InstanceRegistry(object instance, string name)
+            {
+                _instance = instance;
+                Name = name;
+                ServiceType = _instance.GetType();
+            }
+
+            public string Name { get; private set; }
+
+            public IResolvable Resolve(Type targetType)
+            {
+                if(targetType.IsInstanceOfType(_instance))
+                    return this;
+                return null;
+            }
+
+            public Type ServiceType { get; private set; }
+
+            public object Create(params object[] args)
+            {
+                return _instance;
+            }
+
+            public IEnumerable<Type> GetDependencies()
+            {
+                return Enumerable.Empty<Type>();
+            }
         }
     }
 }

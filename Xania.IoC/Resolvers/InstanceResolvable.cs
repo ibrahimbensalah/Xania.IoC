@@ -15,7 +15,7 @@ namespace Xania.IoC.Resolvers
 
         public Type ServiceType
         {
-            get { return _instance.GetType(); }
+            get { return _resolvable.ServiceType; }
         }
 
         public object Create(params object[] args)

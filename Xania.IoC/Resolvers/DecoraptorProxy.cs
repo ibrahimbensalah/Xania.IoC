@@ -38,7 +38,7 @@ namespace Xania.IoC.Resolvers
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Type> GetDependencies()
+        public IEnumerable<IDependency> GetDependencies()
         {
             throw new NotImplementedException();
         }

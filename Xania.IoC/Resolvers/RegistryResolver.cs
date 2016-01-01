@@ -21,12 +21,6 @@ namespace Xania.IoC.Resolvers
                 select resolvable;
         }
 
-        private interface IRegistry
-        {
-            string Name { get; }
-            IResolvable Resolve(Type targetType);
-        }
-
         private sealed class TypeRegistry: IRegistry
         {
             public string Name { get; private set; }
@@ -74,14 +68,20 @@ namespace Xania.IoC.Resolvers
             }
         }
 
-        public void RegisterType(Type serviceType, string name = null)
+        internal IRegistry AddRegistry(IRegistry registry)
         {
-            _registrations.Add(new TypeRegistry(serviceType, name));
+            _registrations.Add(registry);
+            return registry;
         }
 
-        public void RegisterInstance(object serviceInstance, string name = null)
+        internal IRegistry RegisterType(Type serviceType, string name = null)
         {
-            _registrations.Add(new InstanceRegistry(serviceInstance, name));
+            return AddRegistry(new TypeRegistry(serviceType, name));
+        }
+
+        internal IRegistry RegisterInstance(object serviceInstance, string name = null)
+        {
+            return AddRegistry(new InstanceRegistry(serviceInstance, name));
         }
 
         private class InstanceRegistry: IRegistry, IResolvable
@@ -111,10 +111,17 @@ namespace Xania.IoC.Resolvers
                 return _instance;
             }
 
-            public IEnumerable<Type> GetDependencies()
+            public IEnumerable<IDependency> GetDependencies()
             {
-                return Enumerable.Empty<Type>();
+                return Enumerable.Empty<IDependency>();
             }
         }
     }
+
+    internal interface IRegistry
+    {
+        string Name { get; }
+        IResolvable Resolve(Type targetType);
+    }
+
 }

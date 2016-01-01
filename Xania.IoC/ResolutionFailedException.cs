@@ -9,18 +9,23 @@ namespace Xania.IoC
     {
         public IList<Type> Types { get; private set; }
 
-        public ResolutionFailedException(params Type[] types)
+        public ResolutionFailedException(IDependency dependency, params Type[] types)
         {
+            Dependency = dependency;
             Types = new List<Type>(types);
         }
+
+        public IDependency Dependency { get; private set; }
 
         public override string Message
         {
             get
             {
                 var stringBuilder = new StringBuilder();
-                var path = string.Join("\r\n -> ", this.Types.Select(c => c.FullName));
-                return "Resolution failed for type: \r\n -> " +  path;
+                stringBuilder.AppendFormat("Resolution failed for type: \r\n {0}", Dependency);
+                foreach (var type in this.Types)
+                    stringBuilder.AppendFormat("\r\n <- {0} ", type.FullName);
+                return stringBuilder.ToString();
             }
         }
     }

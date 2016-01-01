@@ -9,12 +9,22 @@ namespace Xania.IoC
 {
 	public static class ResolverExtensions
 	{
-		public static T GetService<T>(this IResolver resolver)
-		{
-			return (T)resolver.GetService(typeof(T));
-		}
+        public static IResolvable Resolve<T>(this IResolver resolver)
+        {
+            return resolver.Resolve(typeof(T));
+        }
 
-		public static object GetService(this IResolver resolver, Type serviceType)
+        public static IResolvable Resolve(this IResolver resolver, Type serviceType)
+        {
+            return resolver.ResolveAll(serviceType).FirstOrDefault();
+        }
+
+        public static T GetService<T>(this IResolver resolver)
+        {
+            return (T)resolver.GetService(typeof(T));
+        }
+
+        public static object GetService(this IResolver resolver, Type serviceType)
 		{
 			return resolver.GetServices(serviceType).FirstOrDefault();
 		}
@@ -36,26 +46,31 @@ namespace Xania.IoC
 
 		public static object Build(this IResolver resolver, IResolvable resolvable)
 		{
-			var args = resolvable.GetDependencies().Select(t =>
-			{
-				object instance;
-				try
-				{
-					instance = resolver.GetService(t);
-				}
-				catch (ResolutionFailedException ex)
-				{
-					ex.Types.Add(resolvable.ServiceType);
-					throw;
-				}
-				if (instance == null)
-					throw new ResolutionFailedException(t, resolvable.ServiceType);
-				return instance;
-			}).ToArray();
-			return resolvable.Create(args);
+		    var args = BuildDependencies(resolver, resolvable).ToArray();
+		    return resolvable.Create(args);
 		}
 
-        public static RegistryResolver Register<TService>(this RegistryResolver registryResolver)
+	    private static IEnumerable<object> BuildDependencies(IResolver resolver, IResolvable resolvable)
+	    {
+	        return resolvable.GetDependencies().Select(t =>
+	        {
+	            object instance = null;
+	            try
+	            {
+	                instance = t.Build(resolver);
+	            }
+	            catch (ResolutionFailedException ex)
+	            {
+	                ex.Types.Add(resolvable.ServiceType);
+	                throw;
+	            }
+	            if (instance == null)
+	                throw new ResolutionFailedException(t, resolvable.ServiceType);
+	            return instance;
+	        });
+	    }
+
+	    public static RegistryResolver Register<TService>(this RegistryResolver registryResolver, params Type[] args)
         {
             registryResolver.RegisterType(typeof(TService));
             return registryResolver;

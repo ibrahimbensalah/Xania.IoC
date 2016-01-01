@@ -18,44 +18,54 @@ namespace Xania.IoC.Resolvers
             _scopeProvider = scopeProvider;
         }
 
-        public int Ha { get; set; }
+        public ResolverCollection Resolvers
+        {
+            get { return this; }
+        }
 
         public override IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
             return base.ResolveAll(serviceType)
-                .Select(resolvable => new PerScopeResolvable(resolvable.ServiceType, () => GetOrCreate(resolvable)));
+                .Select(resolvable => new PerScopeResolvable(resolvable, this));
         }
 
-        private object GetOrCreate(IResolvable resolvable)
+        private IDictionary<Type, object> TypeStore
         {
-            return _scopeProvider.Get().Get(resolvable.ServiceType, () => this.Build(resolvable));
+            get { return _scopeProvider.Get(); }
         }
-
 
         public class PerScopeResolvable : IResolvable
         {
-            private readonly Func<object> _factory;
-            private readonly Type _serviceType;
+            private readonly IResolvable _resolvable;
+            private readonly PerScopeResolver _perScopeResolver;
 
-            public PerScopeResolvable(Type serviceType, Func<object> factory)
+            public PerScopeResolvable(IResolvable resolvable, PerScopeResolver perScopeResolver)
             {
-                _serviceType = serviceType;
-                _factory = factory;
+                if (resolvable == null) 
+                    throw new ArgumentNullException("resolvable");
+
+                _resolvable = resolvable;
+                _perScopeResolver = perScopeResolver;
             }
 
             public Type ServiceType
             {
-                get { return _serviceType; }
+                get { return _resolvable.ServiceType; }
             }
 
             public object Create(params object[] args)
             {
-                return _factory();
+                return GetOrCreate();
             }
 
-            public IEnumerable<Type> GetDependencies()
+            public IEnumerable<IDependency> GetDependencies()
             {
-                return Enumerable.Empty<Type>();
+                return Enumerable.Empty<IDependency>();
+            }
+
+            private object GetOrCreate()
+            {
+                return _perScopeResolver.TypeStore.Get(_resolvable.ServiceType, () => _perScopeResolver.Build(_resolvable));
             }
         }
     }

@@ -18,9 +18,9 @@ namespace Xania.IoC
             ServiceType = serviceType;
         }
 
-        public IEnumerable<Type> GetDependencies()
+        public IEnumerable<IDependency> GetDependencies()
         {
-            return _ctor.GetParameters().Select(p => p.ParameterType);
+            return _ctor.GetParameters().Select(p => new TypeDependency(p.ParameterType));
         }
 
         public object Create(params object[] args)

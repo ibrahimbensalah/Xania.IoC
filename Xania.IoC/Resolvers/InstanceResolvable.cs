@@ -23,7 +23,7 @@ namespace Xania.IoC.Resolvers
             return _instance ?? (_instance = _resolvable.Create(args));
         }
 
-        public IEnumerable<Type> GetDependencies()
+        public IEnumerable<IDependency> GetDependencies()
         {
             return _resolvable.GetDependencies();
         }

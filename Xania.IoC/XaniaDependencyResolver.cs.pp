@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 using Xania.IoC;
 using Xania.IoC.Resolvers;
 
 namespace $defaultNamespace$
 {
-    public class XaniaDependencyResolver : ResolverCollection, IDependencyResolver
+    public partial class XaniaDependencyResolver : ResolverCollection
     {
 		IResolver Resolver { get { return this; } }
 
@@ -25,7 +23,7 @@ namespace $defaultNamespace$
 
     public static class XaniaResolverExtensions
     {
-        public static IResolver PerRequest(this IResolver resolver, MvcApplication app)
+        public static IResolver PerRequest(this IResolver resolver, HttpApplication app)
         {
             var scopeProvider = ScopeProvider.FromBackingStore(() => app.Context.Items);
             app.EndRequest += (sender, args) =>
@@ -35,7 +33,7 @@ namespace $defaultNamespace$
             return resolver.PerScope(scopeProvider);
         }
 
-        public static IResolver PerSession(this IResolver resolver, MvcApplication app)
+        public static IResolver PerSession(this IResolver resolver, HttpApplication app)
         {
             return resolver.PerScope(new PerSessionScopeProvider());
         }

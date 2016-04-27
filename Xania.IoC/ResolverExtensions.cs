@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
 
 namespace Xania.IoC
@@ -70,9 +68,15 @@ namespace Xania.IoC
 	        });
 	    }
 
-	    public static RegistryResolver Register<TService>(this RegistryResolver registryResolver, params Type[] args)
+	    public static RegistryResolver Register<TService>(this RegistryResolver registryResolver)
         {
             registryResolver.RegisterType(typeof(TService));
+            return registryResolver;
+        }
+
+        public static RegistryResolver Register(this RegistryResolver registryResolver, Type serviceType)
+        {
+            registryResolver.RegisterType(serviceType);
             return registryResolver;
         }
 

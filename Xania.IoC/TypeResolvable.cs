@@ -46,5 +46,20 @@ namespace Xania.IoC
 
             return null;
         }
+
+        public override int GetHashCode()
+        {
+            return ServiceType.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is TypeResolvable && Equals((TypeResolvable) obj);
+        }
+
+        public bool Equals(TypeResolvable typeResolvable)
+        {
+            return typeResolvable.ServiceType == ServiceType;
+        }
     }
 }

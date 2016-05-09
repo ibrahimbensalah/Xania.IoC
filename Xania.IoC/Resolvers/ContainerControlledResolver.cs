@@ -1,36 +1,41 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Xania.IoC.Resolvers
 {
-    public class ContainerControlledResolver: IResolver
+    public class ContainerControlledResolver: ResolverCollection
     {
-        private readonly IDictionary<Type, IEnumerable<InstanceResolvable>> _resolvableCache = new Dictionary<Type, IEnumerable<InstanceResolvable>>();
-        private readonly IResolver _resolver;
+        // private readonly IDictionary<Type, IEnumerable<StaticResolvable>> _resolvableCache = new Dictionary<Type, IEnumerable<StaticResolvable>>();
+        private readonly IDictionary<IResolvable, ContainerControlledResolvable> _resolvableCache = new ConcurrentDictionary<IResolvable, ContainerControlledResolvable>();
 
         public ContainerControlledResolver(params IResolver[] resolvers)
+            : base(resolvers)
         {
-            _resolver = new ResolverCollection(resolvers);
         }
         
         /// <summary>
-        /// Resolve to InstanceResolver to prevent injecting dependencies from resolvers in higher hierarchy
+        /// Resolve to StaticResolver to prevent injecting dependencies from resolvers in higher hierarchy
         /// </summary>
         /// <param name="serviceType">service type to resolve</param>
         /// <returns></returns>
-        public IEnumerable<IResolvable> ResolveAll(Type serviceType)
+        public override IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
-            return _resolvableCache.Get(serviceType, () => _resolver.ResolveAll(serviceType).Select(e => new InstanceResolvable(e)).ToArray());
+            return 
+                from r in base.ResolveAll(serviceType)
+                select _resolvableCache.Get(r, () => new ContainerControlledResolvable(r));
         }
 
         public void Dispose(Type type)
         {
-            IEnumerable<InstanceResolvable> items;
-            if (_resolvableCache.TryGetValue(type, out items))
+            foreach (var r in base.ResolveAll(type))
             {
-                foreach(var i in items)
-                    i.Dispose();
+                ContainerControlledResolvable x;
+                if (_resolvableCache.TryGetValue(r, out x))
+                {
+                    x.Dispose();
+                }
             }
         }
     }

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using Xania.IoC.Containers;
 using Xania.IoC.Resolvers;
 
 namespace Xania.IoC.Tests
@@ -52,12 +49,27 @@ namespace Xania.IoC.Tests
         }
 
         [Test]
-        public void PerTypeContainer_resolves_same_instance_from_type()
+        public void CCResolver_resolves_same_instance_from_type()
         {
             var container = new ContainerControlledResolver(new ConventionBasedResolver());
 
             var instance1 = container.GetService<DataContext>();
             var instance2 = container.GetService<DataContext>();
+
+            instance1.Should().BeSameAs(instance2);
+        }
+
+        [Test]
+        public void CCResolver_resolves_same_instance_for_all_base_types()
+        {
+            var container = new ContainerControlledResolver
+            {
+                new RegistryResolver()
+                    .Register<DataContext>()
+            };
+            
+            var instance1 = container.GetService<IDisposable>();
+            var instance2 = container.GetService<IDataContext>();
 
             instance1.Should().BeSameAs(instance2);
         }

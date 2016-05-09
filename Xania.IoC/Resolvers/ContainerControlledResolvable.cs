@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Xania.IoC.Resolvers
 {
-    public class InstanceResolvable : IResolvable, IDisposable
+    public class ContainerControlledResolvable : IResolvable, IDisposable
     {
         private readonly IResolvable _resolvable;
         private object _instance;
 
-        public InstanceResolvable(IResolvable resolvable)
+        public ContainerControlledResolvable(IResolvable resolvable)
         {
             _resolvable = resolvable;
         }

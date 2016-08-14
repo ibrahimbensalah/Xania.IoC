@@ -74,9 +74,9 @@ namespace Xania.IoC
             return registryResolver;
         }
 
-        public static RegistryResolver Register(this RegistryResolver registryResolver, Type serviceType)
+        public static RegistryResolver Register(this RegistryResolver registryResolver, Type serviceType, ConstructorArgs args = null)
         {
-            registryResolver.RegisterType(serviceType, null);
+            registryResolver.RegisterType(serviceType, args);
             return registryResolver;
         }
 

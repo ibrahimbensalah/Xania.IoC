@@ -30,7 +30,7 @@ namespace Xania.IoC.Resolvers
         public IEnumerable<IResolvable> ResolveAll(Type serviceType)
         {
             if (BaseTypes.Any(x => IsAssignableFrom(x, serviceType)))
-                yield return TypeResolvable.Create(serviceType);
+                yield return TypeResolvable.Create(serviceType, null);
         }
 
         private static bool IsAssignableFrom(Type baseType, Type type)

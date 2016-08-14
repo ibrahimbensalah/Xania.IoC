@@ -68,15 +68,15 @@ namespace Xania.IoC
 	        });
 	    }
 
-	    public static RegistryResolver Register<TService>(this RegistryResolver registryResolver)
+        public static RegistryResolver Register<TService>(this RegistryResolver registryResolver, ConstructorArgs args = null)
         {
-            registryResolver.RegisterType(typeof(TService));
+            registryResolver.RegisterType(typeof(TService), args);
             return registryResolver;
         }
 
         public static RegistryResolver Register(this RegistryResolver registryResolver, Type serviceType)
         {
-            registryResolver.RegisterType(serviceType);
+            registryResolver.RegisterType(serviceType, null);
             return registryResolver;
         }
 

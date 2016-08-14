@@ -26,7 +26,7 @@ namespace Xania.IoC.Resolvers
         {
             return
                 from implementationType in GetImplementationTypes(serviceType)
-                select TypeResolvable.Create(implementationType);
+                select TypeResolvable.Create(implementationType, null);
         }
 
         private Type[] AllTypes

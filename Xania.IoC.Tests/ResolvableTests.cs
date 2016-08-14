@@ -67,7 +67,7 @@ namespace Xania.IoC.Tests
                 new RegistryResolver()
                     .Register<DataContext>()
             };
-            
+
             var instance1 = container.GetService<IDisposable>();
             var instance2 = container.GetService<IDataContext>();
 
@@ -191,6 +191,19 @@ namespace Xania.IoC.Tests
                 ex.Types.Should().BeEquivalentTo(typeof(ProductService), typeof(ProductController));
             }
         }
+
+        [Test]
+        public void Should_resolve_registered_mapping_with_constructor_args()
+        {
+            var resolver = new RegistryResolver()
+                .Register<ConfigurableService>(new ConstructorArgs("config-value"));
+
+            var resolvable = resolver.Resolve<ConfigurableService>();
+            resolvable.GetDependencies().Should().BeEmpty();
+
+            var instance = resolver.GetService<ConfigurableService>();
+            instance.ConfigurationName.Should().Be("config-value");
+        }
     }
 
     /// <summary>
@@ -235,5 +248,15 @@ namespace Xania.IoC.Tests
 
     public interface IMap<T, T1>
     {
+    }
+
+    public class ConfigurableService
+    {
+        public ConfigurableService(string configurationName)
+        {
+            ConfigurationName = configurationName;
+        }
+
+        public string ConfigurationName { get; set; }
     }
 }

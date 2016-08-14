@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Xania.IoC.Resolvers
 {
@@ -24,21 +25,23 @@ namespace Xania.IoC.Resolvers
         private sealed class TypeRegistry: IRegistry
         {
             public string Name { get; private set; }
+            public ConstructorArgs Args { get; set; }
 
             public IResolvable Resolve(Type targetType)
             {
                 var concreteType = TemplateType.MapTo(targetType);
                 if (concreteType != null)
-                    return TypeResolvable.Create(concreteType);
+                    return TypeResolvable.Create(concreteType, Args);
                 return null;
             }
 
-            public TypeRegistry(Type templateType, string name)
+            public TypeRegistry(Type templateType, ConstructorArgs args, string name)
             {
                 if (templateType == null) 
                     throw new ArgumentNullException("templateType");
 
                 Name = name;
+                Args = args;
                 TemplateType = templateType;
             }
 
@@ -56,7 +59,7 @@ namespace Xania.IoC.Resolvers
                 
             }
 
-            public bool Equals(TypeRegistry typeRegistry)
+            private bool Equals(TypeRegistry typeRegistry)
             {
                 return typeRegistry.TemplateType == TemplateType &&
                        string.Equals(Name, typeRegistry.Name, StringComparison.OrdinalIgnoreCase);
@@ -74,9 +77,9 @@ namespace Xania.IoC.Resolvers
             return registry;
         }
 
-        internal IRegistry RegisterType(Type serviceType, string name = null)
+        internal IRegistry RegisterType(Type serviceType, ConstructorArgs args, string name = null)
         {
-            return AddRegistry(new TypeRegistry(serviceType, name));
+            return AddRegistry(new TypeRegistry(serviceType, args, name));
         }
 
         internal IRegistry RegisterInstance(object serviceInstance, string name = null)
@@ -115,6 +118,34 @@ namespace Xania.IoC.Resolvers
             {
                 return Enumerable.Empty<IDependency>();
             }
+        }
+    }
+
+    public class ConstructorArgs
+    {
+        public object[] Values { get; set; }
+
+        public ConstructorArgs(params object[] values)
+        {
+            Values = values;
+        }
+
+        public bool Matches(ConstructorInfo constructorInfo)
+        {
+            if (constructorInfo.GetParameters().Length != this.Values.Length)
+                return false;
+
+            var parameters = constructorInfo.GetParameters();
+            for (var i = 0; i < Values.Length; i++)
+            {
+                if (this.Values[i] == null)
+                    continue;
+
+                if (!parameters[0].ParameterType.IsInstanceOfType(this.Values[i]))
+                    return false;
+            }
+
+            return true;
         }
     }
 

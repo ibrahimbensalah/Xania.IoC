@@ -12,9 +12,10 @@ namespace Xania.IoC.Tests
 		[TestCase(typeof(IMap<int, double>), typeof(IntKeyMap<>), typeof(IntKeyMap<double>))]
 		[TestCase(typeof(IMap<int, double>), typeof(IntKeySubMap<>), typeof(IntKeySubMap<double>))]
         [TestCase(typeof(MemoryRepository<int>), typeof(MemoryRepository<>), typeof(MemoryRepository<int>))]
+        [TestCase(typeof(TypeMappingTests), typeof(MemoryRepository<>), null)]
         public void GenericType_mapping(Type targetType, Type templateType, Type concreteType)
 		{
-			templateType.MapTo(targetType).Should().Be(concreteType);
+			templateType.MapTo(targetType).Should().BeSameAs(concreteType);
 		}
 
 		private class IntKeyMap<T> : IMap<int, T>

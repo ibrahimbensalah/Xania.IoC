@@ -23,13 +23,16 @@ namespace Xania.IoC
 
         public static Type MapTo(this Type templateType, Type targetType)
         {
-	        if (targetType.IsAssignableFrom(templateType))
+            if (targetType.ContainsGenericParameters)
+                return null;
+
+            if (targetType == templateType || targetType.IsAssignableFrom(templateType))
 		        return templateType;
 
             if (!templateType.ContainsGenericParameters)
                 return null;
 
-            if (targetType.GetGenericTypeDefinition() == templateType)
+            if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == templateType)
                 return targetType;
 
             foreach (var i in templateType.GetParentTypes())

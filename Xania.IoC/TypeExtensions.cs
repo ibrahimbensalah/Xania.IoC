@@ -29,6 +29,9 @@ namespace Xania.IoC
             if (!templateType.ContainsGenericParameters)
                 return null;
 
+            if (targetType.GetGenericTypeDefinition() == templateType)
+                return targetType;
+
             foreach (var i in templateType.GetParentTypes())
             {
                 if (i.IsTemplateTypeOf(targetType))

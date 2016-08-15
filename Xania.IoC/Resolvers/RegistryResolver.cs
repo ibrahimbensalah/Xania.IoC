@@ -141,7 +141,7 @@ namespace Xania.IoC.Resolvers
                 if (this.Values[i] == null)
                     continue;
 
-                if (!parameters[0].ParameterType.IsInstanceOfType(this.Values[i]))
+                if (!parameters[i].ParameterType.IsInstanceOfType(Values[i]))
                     return false;
             }
 
